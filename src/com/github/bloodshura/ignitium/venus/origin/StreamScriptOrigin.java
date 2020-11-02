@@ -24,7 +24,14 @@ public class StreamScriptOrigin implements ScriptOrigin {
 
 	@Override
 	public String read() throws IOException {
-		return getResource().readString();
+		String value = getResource().readString();
+		value = value.replaceAll("\\r", "");
+
+		if (value.startsWith("\uFEFF")) {
+			value = value.substring(1);
+		}
+
+		return value;
 	}
 
 	@Override

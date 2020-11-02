@@ -37,7 +37,14 @@ public class FileScriptOrigin implements ScriptOrigin {
 
 	@Override
 	public String read() throws IOException {
-		return getFile().readString();
+		String value = getFile().readString();
+		value = value.replaceAll("\\r", "");
+
+		if (value.startsWith("\uFEFF")) {
+			value = value.substring(1);
+		}
+
+		return value;
 	}
 
 	@Override

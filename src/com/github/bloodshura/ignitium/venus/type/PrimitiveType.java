@@ -6,16 +6,10 @@ import com.github.bloodshura.ignitium.enumeration.Enumerations;
 import com.github.bloodshura.ignitium.util.XApi;
 import com.github.bloodshura.ignitium.venus.expression.Variable;
 import com.github.bloodshura.ignitium.venus.function.Function;
-import com.github.bloodshura.ignitium.venus.value.ArrayValue;
-import com.github.bloodshura.ignitium.venus.value.BoolValue;
-import com.github.bloodshura.ignitium.venus.value.DecimalValue;
-import com.github.bloodshura.ignitium.venus.value.FunctionRefValue;
-import com.github.bloodshura.ignitium.venus.value.IntegerValue;
-import com.github.bloodshura.ignitium.venus.value.StringValue;
-import com.github.bloodshura.ignitium.venus.value.TypeValue;
-import com.github.bloodshura.ignitium.venus.value.Value;
-import com.github.bloodshura.ignitium.venus.value.VariableRefValue;
+import com.github.bloodshura.ignitium.venus.value.*;
 import com.github.bloodshura.ignitium.worker.UtilWorker;
+
+import java.util.Map;
 
 public final class PrimitiveType extends Type {
 	public static final Type ANY = new PrimitiveType("any", Value.class, Object.class);
@@ -25,7 +19,9 @@ public final class PrimitiveType extends Type {
 	public static final Type FUNCTION_REFERENCE = new PrimitiveType("ref", FunctionRefValue.class, Function.class);
 	public static final Type INTEGER = new PrimitiveType("int", IntegerValue.class, Integer.class, Long.class);
 	public static final Type STRING = new PrimitiveType("string", StringValue.class, String.class);
+	public static final Type VOID = new PrimitiveType("void", Value.class, void.class);
 	public static final Type TYPE = new PrimitiveType("type", TypeValue.class, Type.class);
+	public static final Type MAP = new PrimitiveType("map", MapValue.class, Map.class);
 	public static final Type VARIABLE_REFERENCE = new PrimitiveType("var", VariableRefValue.class, Variable.class);
 
 	private final XView<Class<?>> objectTypes;

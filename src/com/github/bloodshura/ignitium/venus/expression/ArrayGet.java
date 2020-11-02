@@ -7,6 +7,7 @@ import com.github.bloodshura.ignitium.venus.executor.Context;
 import com.github.bloodshura.ignitium.venus.type.PrimitiveType;
 import com.github.bloodshura.ignitium.venus.value.ArrayValue;
 import com.github.bloodshura.ignitium.venus.value.IntegerValue;
+import com.github.bloodshura.ignitium.venus.value.MapValue;
 import com.github.bloodshura.ignitium.venus.value.Value;
 
 public class ArrayGet implements Expression {
@@ -32,10 +33,10 @@ public class ArrayGet implements Expression {
 	@Override
 	public Value resolve(Context context) throws ScriptRuntimeException {
 		Value value = context.getVarValue(getName());
+		Value index = getIndex().resolve(context);
 
 		if (value instanceof ArrayValue) {
 			ArrayValue array = (ArrayValue) value;
-			Value index = getIndex().resolve(context);
 
 			if (index instanceof IntegerValue) {
 				IntegerValue intIndex = (IntegerValue) index;
@@ -44,6 +45,9 @@ public class ArrayGet implements Expression {
 			}
 
 			throw new InvalidArrayAccessException(context, "Index \"" + index + "\" is of type " + index.getType() + "; expected to be an " + PrimitiveType.INTEGER);
+		}else if(value instanceof MapValue) {
+			MapValue map = (MapValue) value;
+			return map.get(context, index);
 		}
 
 		throw new InvalidArrayAccessException(context, "Variable \"" + getName() + "\" is of type " + value.getType() + "; expected to be an " + PrimitiveType.ARRAY);

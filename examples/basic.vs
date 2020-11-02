@@ -10,11 +10,12 @@ using std # Uses library 'std'.
 # Creates a new definition called 'printMyName',
 # which receives a single argument called 'name'
 # of type 'string'.
-def printMyName(string name) {
+def printMyName(string name): void {
     # Calls the method 'println' imported from library
     # 'std', concatenating the argument 'name' with
     # string literal.s
     println("AAAND HIS NAME IS " + name + "!")
+    return
 }
 
 # Calls the created definition, passing

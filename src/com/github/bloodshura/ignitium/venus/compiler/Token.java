@@ -60,6 +60,7 @@ public class Token extends Base {
 		NEW_LINE,
 		COLON,
 		GLOBAL_ACCESS,
-		OBJECT_ACCESS
+		OBJECT_ACCESS,
+		MAP_VALUE_DELIMETER,
 	}
 }

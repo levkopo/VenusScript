@@ -15,6 +15,7 @@ import com.github.bloodshura.ignitium.venus.exception.runtime.ScriptRuntimeExcep
 import com.github.bloodshura.ignitium.venus.expression.Expression;
 import com.github.bloodshura.ignitium.venus.function.Definition;
 import com.github.bloodshura.ignitium.venus.origin.ScriptMode;
+import com.github.bloodshura.ignitium.venus.type.PrimitiveType;
 import com.github.bloodshura.ignitium.venus.value.BoolValue;
 import com.github.bloodshura.ignitium.venus.value.DecimalValue;
 import com.github.bloodshura.ignitium.venus.value.IntegerValue;
@@ -233,9 +234,18 @@ public class VenusExecutor {
 				this.continuing = true;
 			} else if (component instanceof Return) {
 				Return returner = (Return) component;
-				Value value = returner.getExpression().resolve(context);
 
-				if (value != null) {
+				if (returner.getExpression() != null) {
+					Value value = returner.getExpression().resolve(context);
+					if(returner.getParent() instanceof Definition){
+						Definition definition = (Definition) returner.getParent();
+						if(definition.getReturnType().equals(PrimitiveType.VOID))
+							throw new InvalidValueTypeException(context, "Void cannot return values");
+
+						if(!definition.getReturnType().equals(value.getType())
+							&&!definition.getReturnType().equals(PrimitiveType.ANY))
+							throw new InvalidValueTypeException(context,  "The definition was expected to return type of "+definition.getReturnType().getIdentifier());
+					}
 					result = value;
 				}
 

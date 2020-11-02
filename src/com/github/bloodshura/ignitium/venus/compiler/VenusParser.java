@@ -36,6 +36,8 @@ import com.github.bloodshura.ignitium.venus.value.Value;
 import com.github.bloodshura.ignitium.venus.value.VariableRefValue;
 import com.github.bloodshura.ignitium.worker.ParseWorker;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -411,9 +413,19 @@ public class VenusParser {
 				bye(reading, "expected an argument name");
 			}
 		}
+		Type return_type = PrimitiveType.ANY;
 
-		requireToken(Token.Type.OPEN_BRACE, "expected an open brace");
-		addContainer(new Definition(definitionName, arguments, isGlobal), false);
+		Token nextToken = requireToken();
+		if(nextToken.getType() == Token.Type.COLON){
+			Token return_type_token = requireToken();
+			return_type = PrimitiveType.forIdentifier(return_type_token.getValue());
+
+			requireToken(Token.Type.OPEN_BRACE, "expected an open brace");
+		}else if(nextToken.getType()!=Token.Type.OPEN_BRACE)
+			bye(reading, "expected an open brace");
+
+
+		addContainer(new Definition(definitionName, arguments, isGlobal, return_type), false);
 	}
 
 	protected void parseElse() throws ScriptCompileException {
@@ -477,6 +489,10 @@ public class VenusParser {
 
 			addContainer(forContainer, true);
 		}
+	}
+
+	protected void parseMap(){
+
 	}
 
 	protected void parseIf(boolean isElseIf) throws ScriptCompileException {
@@ -756,6 +772,21 @@ public class VenusParser {
 					nameDef = token.getValue();
 					nameDefToken = token;
 				}
+			} else if(token.getType() == Token.Type.OPEN_BRACE){
+				Map<Value, Expression> map = new HashMap<>();
+
+				while(requireToken().getType() != Token.Type.CLOSE_BRACE){
+					Value name = readValue();
+					requireToken(Token.Type.COLON, "expected colon");
+					Expression value = readExpression(t -> t.getType() != Token.Type.CLOSE_BRACE
+						&& t.getType() != Token.Type.COMMA,
+						t -> t.getType() == Token.Type.CLOSE_BRACE);
+
+					map.put(name, value);
+				}
+
+				arrayIndex = null;
+				expression.addExpression(this, token, new MapLiteral(map));
 			} else if (token.getType() != Token.Type.NEW_LINE) {
 				bye(token, "unexpected token");
 			}

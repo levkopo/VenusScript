@@ -28,6 +28,7 @@ public class KeywordDefinitions {
 	public static final String TRUE = "true";
 	public static final String USING = "using";
 	public static final String WHILE = "while";
+	public static final String MAP_VALUE_DELIMETER = "=>";
 
 	public static boolean isKeyword(String definition) {
 		return values().contains(definition);

@@ -16,18 +16,20 @@ public final class Definition extends Container implements Function {
 	private final XList<Argument> arguments;
 	private final boolean global;
 	private final String name;
+	private final Type returnType;
 
-	public Definition(String name, XList<Argument> arguments, boolean global) {
+	public Definition(String name, XList<Argument> arguments, boolean global, Type returnType) {
 		this.arguments = arguments;
 		this.global = global;
 		this.name = name;
+		this.returnType = returnType;
 	}
 
 	@Override
 	public Value call(Context context, FunctionCallDescriptor descriptor) throws ScriptRuntimeException {
 		int i = 0;
 
-		if (!isGlobal()) {
+		if (!isGlobal()){
 			this.context = new Context(this, context);
 		}
 
@@ -50,6 +52,10 @@ public final class Definition extends Container implements Function {
 
 	public XView<Argument> getArguments() {
 		return new XBasicView<>(arguments);
+	}
+
+	public Type getReturnType() {
+		return returnType;
 	}
 
 	@Nonnull
