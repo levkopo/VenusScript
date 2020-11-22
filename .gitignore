@@ -1,9 +1,9 @@
 /.idea/workspace.xml
 /target/
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/encodings.xml
+.idea/
+.idea/*
 .gradle/
 /out/
+/out/*
 /vs-fpm/
 /vs-fpm/*
