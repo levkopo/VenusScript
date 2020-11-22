@@ -11,7 +11,7 @@ object SimpleList(elements: []) {
 
     def contains(any obj) {
         for element in elements {
-            if element == object {
+            if element == obj{
                 return true
             }
         }

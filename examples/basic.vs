@@ -18,6 +18,4 @@ def printMyName(string name): void {
     return
 }
 
-# Calls the created definition, passing
-# 'João Vitor Verona Biazibetti' as argument.
-printMyName("João Vitor Verona Biazibetti")
+printMyName("Лев Копорушкин")

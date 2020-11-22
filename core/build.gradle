@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+}
+
+group 'com.levkopo.vs'
+version '0.1.0'
+
+compileJava {
+    options.fork = true
+    options.forkOptions.executable = 'javac'
+    options.compilerArgs << "-XDignore.symbol.file"
+}
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile('com.github.bloodshura:ignitium-core:0.1.0')
+    compile('com.github.bloodshura:ignitium-crypto:0.1.0')
+    compile('com.github.bloodshura:sparkium-desktop:0.1.0')
+    compile 'org.ow2.asm:asm:7.1'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}

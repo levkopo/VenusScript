@@ -8,4 +8,4 @@ map = {
 	}
 }
 
-println(map.map)
+println(map.map.int)

@@ -1,0 +1,20 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="fpm.jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/fpm</output-path>
+    <root id="archive" name="fpm.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/fpm/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="VSNew.fpm.main" />
+      <element id="module-output" name="VSNew.core.main" />
+      <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.bloodshura/ignitium-assets/0.1.0/bbf6003441f7ba46eb6d8799c33f3fb5a6680875/ignitium-assets-0.1.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.gnu/gnu-crypto/2.0.1/f53ad21694351e9cc3b4bfb2f5c1bb68aa4d2bae/gnu-crypto-2.0.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.bloodshura/ignitium-core/0.1.0/ee4d867157c2b99d989f5615e4a8fff30d3d075b/ignitium-core-0.1.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.code.findbugs/jsr305/3.0.2/25ea2e8b0c338a877313bd4672d3fe056ea78f0d/jsr305-3.0.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.bloodshura/sparkium-desktop/0.1.0/78269c50133d6fdc80a679d8836b32d505b6ccd3/sparkium-desktop-0.1.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.bloodshura/ignitium-cfg/0.1.0/edc68e0d9700c903e59e035e619aaddc8e6bb66b/ignitium-cfg-0.1.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.bloodshura/ignitium-crypto/0.1.0/a42b3db129fe20e79f9d0fd34d32825bedd0f346/ignitium-crypto-0.1.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.mindrot/jbcrypt/0.4/af7e61017f73abb18ac4e036954f9f28c6366c07/jbcrypt-0.4.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

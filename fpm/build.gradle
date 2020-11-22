@@ -1,0 +1,15 @@
+plugins {
+    id 'java'
+}
+
+group 'com.levkopo.vs.fpm'
+version '0.1'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(':core')
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}

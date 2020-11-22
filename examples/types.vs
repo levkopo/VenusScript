@@ -13,6 +13,7 @@ e = false
 f = true
 g = *string
 h = *any
+i = null
 
 println(*a)
 println(*b)
@@ -22,6 +23,7 @@ println(*e)
 println(*f)
 println(*g)
 println(*h)
+println(*i)
 println("Running assertions...")
 assert((*a) == (*string))
 assert((*b) == (*decimal))
@@ -31,3 +33,4 @@ assert((*e) == (*bool))
 assert((*f) == (*bool))
 assert((*g) == (*type))
 assert((*h) == (*type))
+assert((*i) == (*any))
