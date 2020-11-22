@@ -3,7 +3,10 @@
 .idea/
 .idea/*
 .gradle/
+.gradle/*
 /out/
 /out/*
 /vs-fpm/
 /vs-fpm/*
+*/build/
+*/build/*
