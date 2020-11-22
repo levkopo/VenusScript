@@ -8,8 +8,6 @@ import com.levkopo.vs.Config;
 import com.levkopo.vs.component.SimpleContainer;
 import com.levkopo.vs.exception.runtime.UndefinedVariableException;
 import com.levkopo.vs.library.VenusLibrary;
-import com.levkopo.vs.library.crypto.CryptoLibrary;
-import com.levkopo.vs.library.dialogs.DialogsLibrary;
 import com.levkopo.vs.library.dynamic.DynamicLibrary;
 import com.levkopo.vs.library.engine.EngineLibrary;
 import com.levkopo.vs.library.json.JSONLibrary;
