@@ -3,9 +3,7 @@
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/encodings.xml
-.idea/compiler.xml
-.idea/compiler.xml
-.idea/encodings.xml
 .gradle/
 /out/
 /vs-fpm/
+/vs-fpm/*
