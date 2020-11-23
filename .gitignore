@@ -1,9 +1,9 @@
 /.idea/workspace.xml
 /target/
-.idea/
-.idea/*
-.gradle/
-.gradle/*
+/.idea/
+/.idea/*
+/.gradle/
+/.gradle/*
 /out/
 /out/*
 /vs-fpm/
