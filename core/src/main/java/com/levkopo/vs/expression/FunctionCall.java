@@ -1,10 +1,5 @@
 package com.levkopo.vs.expression;
 
-import com.github.bloodshura.ignitium.collection.list.XList;
-import com.github.bloodshura.ignitium.collection.list.impl.XArrayList;
-import com.github.bloodshura.ignitium.collection.view.XArrayView;
-import com.github.bloodshura.ignitium.collection.view.XBasicView;
-import com.github.bloodshura.ignitium.collection.view.XView;
 import com.levkopo.vs.exception.runtime.InvalidFunctionParameterException;
 import com.levkopo.vs.exception.runtime.ScriptRuntimeException;
 import com.levkopo.vs.executor.Context;
@@ -16,6 +11,10 @@ import com.levkopo.vs.value.DecimalValue;
 import com.levkopo.vs.value.IntegerValue;
 import com.levkopo.vs.value.Value;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class FunctionCall implements Expression {
 	private final Expression[] arguments;
 	private final String functionName;
@@ -25,8 +24,8 @@ public class FunctionCall implements Expression {
 		this.functionName = functionName;
 	}
 
-	public XView<Expression> getArguments() {
-		return new XArrayView<>(arguments);
+	public List<Expression> getArguments() {
+		return Arrays.asList(arguments);
 	}
 
 	public String getFunctionName() {
@@ -35,10 +34,16 @@ public class FunctionCall implements Expression {
 
 	@Override
 	public Value resolve(Context context, Context args_parent) throws ScriptRuntimeException{
-		XView<Value> values = getArguments().mapExceptional(expression -> expression.resolve(context, args_parent));
-		XView<Type> types = values.map(Value::getType);
+		List<Value> values = new ArrayList<>();
+		List<Type> types = new ArrayList<>();
+		for(Expression expression: getArguments()) {
+			Value value = expression.resolve(context, args_parent);
+			values.add(value);
+			types.add(value.getType());
+		}
+
 		Function function = context.getOwner().findFunction(context, getFunctionName(), types);
-		XList<Value> list = new XArrayList<>();
+		List<Value> list = new ArrayList<>();
 		int i = 0;
 
 		// This check is necessary because of function references being untyped (issue #9).
@@ -64,12 +69,12 @@ public class FunctionCall implements Expression {
 			i++;
 		}
 
-		return function.call(context, new FunctionCallDescriptor(this, getArguments(), new XBasicView<>(list)));
+		return function.call(context, new FunctionCallDescriptor(this, getArguments(), list));
 
 	}
 
 	@Override
 	public String toString() {
-		return "functioncall(" + getFunctionName() + " <-- [" + getArguments().toString(", ") + "])";
+		return "functioncall(" + getFunctionName() + " <-- " + getArguments().toString() + ")";
 	}
 }

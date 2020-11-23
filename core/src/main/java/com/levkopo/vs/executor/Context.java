@@ -1,41 +1,41 @@
 package com.levkopo.vs.executor;
 
-import com.github.bloodshura.ignitium.collection.map.XMap;
-import com.github.bloodshura.ignitium.collection.map.impl.XLinkedMap;
-import com.github.bloodshura.ignitium.util.XApi;
 import com.levkopo.vs.component.Container;
 import com.levkopo.vs.component.Script;
 import com.levkopo.vs.exception.runtime.UndefinedVariableException;
-import com.levkopo.vs.expression.Constant;
 import com.levkopo.vs.expression.Variable;
-import com.levkopo.vs.value.IntegerValue;
 import com.levkopo.vs.value.NullValue;
 import com.levkopo.vs.value.Value;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Context implements Cloneable {
 	private static int NEXT_ID = 0;
 	private final int id;
 	private final Container owner;
 	private final Context parent;
-	private final XMap<String, VariableStructure> variables;
+	private final Map<String, VariableStructure> variables;
 
 	public Context(Container owner, Context parent) {
 		this.id = NEXT_ID++;
 		this.owner = owner;
 		this.parent = parent;
-		this.variables = new XLinkedMap<>();
-		this.variables.add("null", new VariableStructure(new NullValue()));
+		this.variables = new HashMap<>();
+		this.variables.put("null", new VariableStructure(new NullValue()));
 	}
 
 	@Override
-	public Context clone() {
+	public Context clone() throws CloneNotSupportedException {
+		super.clone();
+
 		return cloneWith(getOwner(), getParent());
 	}
 
 	public Context cloneWith(Container owner, Context parent) {
 		Context context = new Context(owner, parent);
 
-		context.getVariables().addAll(getVariables());
+		context.getVariables().putAll(getVariables());
 
 		return context;
 	}
@@ -86,8 +86,6 @@ public class Context implements Cloneable {
 	}
 
 	public Value getVarValue(String name) throws UndefinedVariableException {
-		XApi.requireNonNull(name, "name");
-
 		return getVar(name).getValue();
 	}
 
@@ -95,7 +93,7 @@ public class Context implements Cloneable {
 		return getVarValue(variable.getName());
 	}
 
-	public XMap<String, VariableStructure> getVariables() {
+	public Map<String, VariableStructure> getVariables() {
 		return variables;
 	}
 
@@ -103,7 +101,7 @@ public class Context implements Cloneable {
 		return getParent() != null;
 	}
 
-	public boolean hasVar(String name) throws UndefinedVariableException {
+	public boolean hasVar(String name) {
 		if (name.length() > 1 && name.charAt(0) == '$') {
 			return getApplicationContext().hasVar(name.substring(1));
 		}
@@ -117,12 +115,8 @@ public class Context implements Cloneable {
 
 	public void setVar(String name, Value value) {
 		if (!changeVar(name, value)) {
-			getVariables().add(name, new VariableStructure(value));
+			getVariables().put(name, new VariableStructure(value));
 		}
-	}
-
-	public String toDetailedString() {
-		return "context(owner=" + getOwner() + ", vars=" + getVariables() + ", parent=" + getParent() + ')';
 	}
 
 	@Override
@@ -138,7 +132,7 @@ public class Context implements Cloneable {
 		}
 
 		if (isOwnerOf(name)) {
-			getVariables().get(name).setValue(value);
+			getVariables().put(name, new VariableStructure(value));
 
 			return true;
 		}

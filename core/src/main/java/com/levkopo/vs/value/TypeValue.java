@@ -1,6 +1,5 @@
 package com.levkopo.vs.value;
 
-import com.github.bloodshura.ignitium.util.XApi;
 import com.levkopo.vs.type.PrimitiveType;
 import com.levkopo.vs.type.Type;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
@@ -10,8 +9,6 @@ public class TypeValue extends Value {
 
 	public TypeValue(Type value) {
 		super(PrimitiveType.TYPE);
-		XApi.requireNonNull(value, "value");
-
 		this.value = value;
 	}
 

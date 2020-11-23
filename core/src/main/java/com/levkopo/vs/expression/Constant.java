@@ -1,7 +1,5 @@
 package com.levkopo.vs.expression;
 
-import com.github.bloodshura.ignitium.util.XApi;
-import com.levkopo.vs.exception.runtime.ScriptRuntimeException;
 import com.levkopo.vs.executor.Context;
 import com.levkopo.vs.value.Value;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
@@ -12,8 +10,6 @@ public class Constant implements Expression {
 	private final Value value;
 
 	public Constant(Value value) {
-		XApi.requireNonNull(value, "value");
-
 		this.value = value;
 	}
 

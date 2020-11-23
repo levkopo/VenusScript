@@ -1,7 +1,5 @@
 package com.levkopo.vs.expression;
 
-import com.github.bloodshura.ignitium.collection.map.XMap;
-import com.github.bloodshura.ignitium.collection.tuple.Pair;
 import com.levkopo.vs.component.object.Attribute;
 import com.levkopo.vs.component.object.ObjectDefinition;
 import com.levkopo.vs.exception.runtime.ScriptRuntimeException;
@@ -10,16 +8,18 @@ import com.levkopo.vs.executor.Context;
 import com.levkopo.vs.value.ObjectValue;
 import com.levkopo.vs.value.Value;
 
+import java.util.Map;
+
 public class NewObject implements Expression {
-	private final XMap<String, Expression> attributes;
+	private final Map<String, Expression> attributes;
 	private final String objectType;
 
-	public NewObject(String objectType, XMap<String, Expression> attributes) {
+	public NewObject(String objectType, Map<String, Expression> attributes) {
 		this.attributes = attributes;
 		this.objectType = objectType;
 	}
 
-	public XMap<String, Expression> getAttributes() {
+	public Map<String, Expression> getAttributes() {
 		return attributes;
 	}
 
@@ -32,15 +32,20 @@ public class NewObject implements Expression {
 		ObjectDefinition definition = context.getOwner().findObjectDefinition(context, getObjectType());
 		Context c = new Context(definition, null); // See issue #24
 
-		for (Pair<String, Expression> pair : getAttributes()) {
-			Attribute attribute = definition.getAttributes().selectFirst(attrib -> attrib.getName().equals(pair.getLeft()));
+		for (Map.Entry<String, Expression> pair : getAttributes().entrySet()) {
+			Attribute attribute = null;
+			for(Attribute attr: definition.getAttributes()){
+				if(attr.getName().equals(pair.getKey())) {
+					attribute = attr;
+				}
+			}
 
 			if (attribute != null) {
-				Value value = pair.getRight().resolve(context, vars_context);
+				Value value = pair.getValue().resolve(context, vars_context);
 
-				c.setVar(pair.getLeft(), value);
+				c.setVar(pair.getKey(), value);
 			} else {
-				throw new UndefinedAttributeException(context, definition, pair.getLeft());
+				throw new UndefinedAttributeException(context, definition, pair.getKey());
 			}
 		}
 

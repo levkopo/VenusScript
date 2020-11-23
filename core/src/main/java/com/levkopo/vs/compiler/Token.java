@@ -1,10 +1,8 @@
 package com.levkopo.vs.compiler;
 
-import com.github.bloodshura.ignitium.object.Base;
+import com.sun.istack.internal.NotNull;
 
-import javax.annotation.Nonnull;
-
-public class Token extends Base {
+public class Token {
 	private final Type type;
 	private final String value;
 
@@ -25,7 +23,7 @@ public class Token extends Base {
 		return value;
 	}
 
-	@Nonnull
+	@NotNull
 	@Override
 	public String toString() {
 		if (getValue() != null) {
@@ -33,12 +31,6 @@ public class Token extends Base {
 		}
 
 		return getType().toString();
-	}
-
-	@Nonnull
-	@Override
-	protected Object[] stringValues() {
-		return new Object[] { getType(), getValue() };
 	}
 
 	public enum Type {

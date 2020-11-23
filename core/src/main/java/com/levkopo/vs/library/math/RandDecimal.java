@@ -1,6 +1,5 @@
 package com.levkopo.vs.library.math;
 
-import com.github.bloodshura.ignitium.math.random.XRandom;
 import com.levkopo.vs.exception.runtime.ScriptRuntimeException;
 import com.levkopo.vs.executor.Context;
 import com.levkopo.vs.function.FunctionCallDescriptor;
@@ -9,6 +8,8 @@ import com.levkopo.vs.function.annotation.MethodArgs;
 import com.levkopo.vs.function.annotation.MethodName;
 import com.levkopo.vs.value.DecimalValue;
 import com.levkopo.vs.value.Value;
+
+import java.util.Random;
 
 @MethodArgs({ DecimalValue.class, DecimalValue.class })
 @MethodName("randDecimal")
@@ -27,6 +28,7 @@ public class RandDecimal extends Method {
 			minValue = temp;
 		}
 
-		return new DecimalValue(XRandom.INSTANCE.nextDouble(minValue, maxValue));
+		Random r = new Random();
+		return new DecimalValue(minValue + (maxValue - minValue) * r.nextDouble());
 	}
 }

@@ -1,10 +1,7 @@
 package com.levkopo.vs.value;
 
-import com.github.bloodshura.ignitium.charset.TextBuilder;
-import com.github.bloodshura.ignitium.collection.tuple.Pair;
 import com.levkopo.vs.component.object.ObjectDefinition;
 import com.levkopo.vs.executor.Context;
-import com.levkopo.vs.executor.VariableStructure;
 
 public class ObjectValue extends Value {
 	private final Context context;
@@ -18,7 +15,11 @@ public class ObjectValue extends Value {
 
 	@Override
 	public ObjectValue clone() {
-		return new ObjectValue(getDefinition(), getContext().clone());
+		try {
+			return new ObjectValue(getDefinition(), getContext().clone());
+		} catch (CloneNotSupportedException e) {
+			return null;
+		}
 	}
 
 	public Context getContext() {
@@ -36,12 +37,6 @@ public class ObjectValue extends Value {
 
 	@Override
 	public String toString() {
-		TextBuilder attributes = new TextBuilder().setSeparator(", ");
-
-		for (Pair<String, VariableStructure> pair : getContext().getVariables()) {
-			attributes.append(pair.getLeft() + ": " + pair.getRight() + " [" + pair.getRight().getValue().getType() + ']');
-		}
-
-		return getDefinition().getName() + "(" + attributes + ')';
+		return getDefinition().getName() + "(" + getDefinition().getAttributes() + ')';
 	}
 }

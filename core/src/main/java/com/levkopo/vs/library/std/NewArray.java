@@ -9,7 +9,8 @@ import com.levkopo.vs.function.annotation.MethodName;
 import com.levkopo.vs.value.ArrayValue;
 import com.levkopo.vs.value.IntegerValue;
 import com.levkopo.vs.value.Value;
-import com.github.bloodshura.ignitium.worker.ArrayWorker;
+
+import java.util.Arrays;
 
 @MethodArgs({ IntegerValue.class, Value.class })
 @MethodName("newArray")
@@ -19,7 +20,7 @@ public class NewArray extends Method {
 		IntegerValue size = (IntegerValue) descriptor.get(0);
 		Value[] content = new Value[size.value().intValue()];
 
-		ArrayWorker.fill(content, descriptor.get(1));
+		Arrays.fill(content, descriptor.get(1));
 
 		return new ArrayValue(content);
 	}

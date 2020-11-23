@@ -1,25 +1,20 @@
 package com.levkopo.vs.operator;
 
-import com.github.bloodshura.ignitium.collection.view.XArrayView;
-import com.github.bloodshura.ignitium.collection.view.XView;
-import com.github.bloodshura.ignitium.util.XApi;
 import com.levkopo.vs.executor.Context;
 import com.levkopo.vs.value.Value;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 
 public class UnaryOperator implements Operator {
 	private final Function<Value, Value> function;
-	private final XView<String> identifiers;
+	private final List<String> identifiers;
 	private final String name;
 
 	public UnaryOperator(String name, Function<Value, Value> function, String... identifiers) {
-		XApi.requireNonNull(function, "function");
-		XApi.requireNonNull(identifiers, "identifiers");
-		XApi.requireNonNull(name, "name");
-
 		this.function = function;
-		this.identifiers = new XArrayView<>(identifiers);
+		this.identifiers = Arrays.asList(identifiers);
 		this.name = name;
 	}
 
@@ -28,7 +23,7 @@ public class UnaryOperator implements Operator {
 	}
 
 	@Override
-	public XView<String> getIdentifiers() {
+	public List<String> getIdentifiers() {
 		return identifiers;
 	}
 

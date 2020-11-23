@@ -1,12 +1,11 @@
 package com.levkopo.vs.library;
 
-import com.github.bloodshura.ignitium.collection.list.impl.XArrayList;
-import com.levkopo.vs.component.object.ObjectDefinition;
 import com.levkopo.vs.function.Function;
 
-public class VenusLibrary extends XArrayList<Function> {
+import java.util.ArrayList;
 
-	@Deprecated
+public class VenusLibrary extends ArrayList<Function> {
+
 	public boolean add(Class<? extends Function> object) {
 		try {
 			return add(object.newInstance());
@@ -15,7 +14,6 @@ public class VenusLibrary extends XArrayList<Function> {
 		}
 	}
 
-	@Deprecated
 	@SafeVarargs
 	public final boolean addAll(Class<? extends Function>... objects) {
 		boolean allAdded = true;

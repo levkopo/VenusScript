@@ -1,6 +1,5 @@
 package com.levkopo.vs.expression;
 
-import com.github.bloodshura.ignitium.util.XApi;
 import com.levkopo.vs.exception.runtime.IncompatibleTypesException;
 import com.levkopo.vs.exception.runtime.ScriptRuntimeException;
 import com.levkopo.vs.executor.Context;
@@ -12,9 +11,6 @@ public class UnaryOperation implements Expression {
 	private final Expression expression;
 
 	public UnaryOperation(UnaryOperator operator, Expression expression) {
-		XApi.requireNonNull(expression, "expression");
-		XApi.requireNonNull(operator, "operator");
-
 		this.operator = operator;
 		this.expression = expression;
 	}

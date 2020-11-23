@@ -1,7 +1,6 @@
 package com.levkopo.vs.fpm;
 
 import com.fastcgi.FCGIInterface;
-import com.github.bloodshura.ignitium.io.File;
 import com.levkopo.vs.component.Script;
 import com.levkopo.vs.executor.ApplicationContext;
 import com.levkopo.vs.executor.OutputReference;
@@ -11,13 +10,14 @@ import com.levkopo.vs.origin.FileScriptOrigin;
 import com.levkopo.vs.origin.ScriptMode;
 import com.levkopo.vs.origin.ScriptOrigin;
 
-import java.io.PrintStream;
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.lang.System.*;
+import static java.lang.System.getProperty;
+import static java.lang.System.out;
 
 public class FastCGIApplication {
 
@@ -34,7 +34,7 @@ public class FastCGIApplication {
             Map<String, String> headers = new HashMap<>();
             try {
                 ApplicationContext ctx = new ApplicationContext();
-                ctx.getLibrarySuppliers().add("fpm", FPMLibrary::new);
+                ctx.getLibrarySuppliers().put("fpm", FPMLibrary::new);
                 ctx.setUserData("in", null);
                 ctx.setUserData("out", (OutputReference) output::append);
                 ctx.setUserData("query", parseQuery(getProperty("QUERY_STRING")));

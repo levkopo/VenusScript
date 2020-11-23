@@ -1,9 +1,3 @@
-# VenusScript - If container example.
-# This script shows some variations of
-# usages for 'if' containers.
-# Should be self explanatory if you already
-# understand expressions.
-
 using std
 
 i = 5
@@ -55,3 +49,10 @@ else if j == 3 {
 else {
     println("Yeah!")
 }
+--
+Yeah!
+Yeah!
+Yeah!
+Yeah!
+Yeah!
+Yeah!

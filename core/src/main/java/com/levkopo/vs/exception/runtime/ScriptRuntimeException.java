@@ -1,9 +1,8 @@
 package com.levkopo.vs.exception.runtime;
 
-import com.github.bloodshura.ignitium.exception.CheckedException;
 import com.levkopo.vs.executor.Context;
 
-public class ScriptRuntimeException extends CheckedException {
+public class ScriptRuntimeException extends Exception {
 	private final Context context;
 
 	public ScriptRuntimeException(Context context, CharSequence message) {

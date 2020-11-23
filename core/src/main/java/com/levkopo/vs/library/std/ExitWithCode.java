@@ -12,7 +12,7 @@ import com.levkopo.vs.value.IntegerValue;
 @MethodName("exit")
 public class ExitWithCode extends VoidMethod {
 	@Override
-	public void callVoid(Context context, FunctionCallDescriptor descriptor) throws ScriptRuntimeException {
+	public void callVoid(Context context, FunctionCallDescriptor descriptor) {
 		IntegerValue code = (IntegerValue) descriptor.get(0);
 
 		System.exit(code.value().intValue());

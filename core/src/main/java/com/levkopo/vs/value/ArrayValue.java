@@ -1,15 +1,12 @@
 package com.levkopo.vs.value;
 
-import com.github.bloodshura.ignitium.charset.TextBuilder;
-import com.github.bloodshura.ignitium.util.XApi;
-import com.github.bloodshura.ignitium.util.comparator.SimpleEqualizer;
-import com.github.bloodshura.ignitium.util.iterator.ArrayIterator;
 import com.levkopo.vs.exception.runtime.InvalidArrayAccessException;
 import com.levkopo.vs.exception.runtime.ScriptRuntimeException;
 import com.levkopo.vs.executor.Context;
 import com.levkopo.vs.type.PrimitiveType;
-import com.github.bloodshura.ignitium.worker.ArrayWorker;
+import com.sun.istack.internal.NotNull;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 public class ArrayValue extends IterableValue {
@@ -21,14 +18,13 @@ public class ArrayValue extends IterableValue {
 
 	public ArrayValue(Value... values) {
 		super(PrimitiveType.ARRAY);
-		XApi.requireNonNull(values, "values");
 
 		this.values = values;
 	}
 
 	@Override
 	public ArrayValue clone() {
-		return new ArrayValue(ArrayWorker.copyOf(value()));
+		return new ArrayValue(Arrays.copyOf(values, values.length));
 	}
 
 	@Override
@@ -36,7 +32,7 @@ public class ArrayValue extends IterableValue {
 		if (value instanceof ArrayValue) {
 			ArrayValue array = (ArrayValue) value;
 
-			return new BoolValue(size() == array.size() && SimpleEqualizer.compare(value(), array.value()));
+			return new BoolValue(size() == array.size() && Arrays.equals(value(), array.value()));
 		}
 
 		return new BoolValue(false);
@@ -52,7 +48,7 @@ public class ArrayValue extends IterableValue {
 
 	@Override
 	public Iterator<Value> iterator() {
-		return new ArrayIterator<>(value());
+		return Arrays.stream(values).iterator();
 	}
 
 	public void set(Context context, int index, Value value) throws ScriptRuntimeException {
@@ -77,17 +73,7 @@ public class ArrayValue extends IterableValue {
 		return values;
 	}
 
-	private static <E> String toString(ArrayValue array) {
-		TextBuilder builder = new TextBuilder().setSeparator(", ");
-
-		for (Value value : array.value()) {
-			if (value instanceof ArrayValue) {
-				builder.append('[' + toString((ArrayValue) value) + ']');
-			} else {
-				builder.append(value);
-			}
-		}
-
-		return '[' + builder.toString() + ']';
+	private static String toString(ArrayValue array) {
+		return Arrays.toString(array.value());
 	}
 }

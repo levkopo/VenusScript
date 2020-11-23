@@ -1,17 +1,7 @@
 package com.levkopo.vs.test;
 
-import com.github.bloodshura.ignitium.activity.logging.XLogger;
-import com.github.bloodshura.ignitium.activity.scanning.XScanner;
-import com.github.bloodshura.ignitium.collection.view.XView;
-import com.github.bloodshura.ignitium.io.Directory;
-import com.github.bloodshura.ignitium.io.File;
-import com.github.bloodshura.ignitium.worker.ParseWorker;
-import com.levkopo.vs.compiler.BytecodeCompiler;
-
-import static com.github.bloodshura.ignitium.sys.XSystem.millis;
-
 public class BytecodeInteractiveTester {
-	public static final Directory DIRECTORY = new Directory("./examples/bytecode");
+	/*ublic static final Directory DIRECTORY = new Directory("./examples/bytecode");
 
 	public static void main(String[] args) throws Exception {
 		XView<File> files = DIRECTORY.getDeepFiles();
@@ -47,5 +37,5 @@ public class BytecodeInteractiveTester {
 
 		XLogger.println("Duration: " + duration + "ms");
 		System.exit(0);
-	}
+	}*/
 }

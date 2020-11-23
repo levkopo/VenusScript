@@ -1,33 +1,31 @@
 package com.levkopo.vs.compiler;
 
-import com.github.bloodshura.ignitium.charset.TextBuilder;
-import com.github.bloodshura.ignitium.charset.sequence.CharSet;
-import com.github.bloodshura.ignitium.collection.store.impl.XQueue;
 import com.levkopo.vs.compiler.Token.Type;
 import com.levkopo.vs.exception.compile.UnexpectedInputException;
 import com.levkopo.vs.origin.ScriptOrigin;
-import com.github.bloodshura.ignitium.worker.StringWorker;
 
 import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.Queue;
 
 import static com.levkopo.vs.compiler.VenusLexer.State.*;
 
 public class VenusLexer {
-	private final TextBuilder buildingToken;
+	private final StringBuilder buildingToken;
 	private boolean insideComment;
 	private char lastChar;
 	private int line;
 	private Type numberLiteralType;
 	private final ScriptOrigin origin;
 	private int position;
-	private final XQueue<Token> reread;
+	private final Queue<Token> reread;
 	private State state;
 	private final String string;
 
 	public VenusLexer(ScriptOrigin origin) throws IOException {
-		this.buildingToken = new TextBuilder();
+		this.buildingToken = new StringBuilder();
 		this.origin = origin;
-		this.reread = new XQueue<>();
+		this.reread = new ArrayDeque<>();
 		this.string = origin.read();
 	}
 
@@ -63,7 +61,9 @@ public class VenusLexer {
 
 						this.state = null;
 
-						return new Token(Type.NAME_DEFINITION, buildingToken.toStringAndClear());
+						Token token = new Token(Type.NAME_DEFINITION, buildingToken.toString());
+						buildingToken.setLength(0);
+						return token;
 					}
 
 					if (state == IN_NUMBER_LITERAL) {
@@ -71,7 +71,9 @@ public class VenusLexer {
 
 						this.state = null;
 
-						return new Token(numberLiteralType, buildingToken.toStringAndClear());
+						Token token = new Token(numberLiteralType, buildingToken.toString());
+						buildingToken.setLength(0);
+						return token;
 					}
 
 					this.line++;
@@ -87,7 +89,9 @@ public class VenusLexer {
 					if (state == IN_STRING_LITERAL) {
 						this.state = null;
 
-						return new Token(Type.STRING_LITERAL, buildingToken.toStringAndClear());
+						Token token = new Token(Type.STRING_LITERAL, buildingToken.toString());
+						buildingToken.setLength(0);
+						return token;
 					}
 
 					if (state == IN_NUMBER_LITERAL) {
@@ -107,7 +111,9 @@ public class VenusLexer {
 					if (state == IN_CHAR_LITERAL) {
 						this.state = null;
 
-						return new Token(Type.CHAR_LITERAL, buildingToken.toStringAndClear());
+						Token token = new Token(Type.CHAR_LITERAL, buildingToken.toString());
+						buildingToken.setLength(0);
+						return token;
 					}
 
 					if (state == IN_NUMBER_LITERAL) {
@@ -128,7 +134,7 @@ public class VenusLexer {
 						if (numberLiteralType == Type.DECIMAL_LITERAL) {
 							this.numberLiteralType = Type.BINARY_LITERAL;
 
-							buildingToken.clear();
+							buildingToken.setLength(0);
 
 							continue;
 						} else {
@@ -140,7 +146,7 @@ public class VenusLexer {
 						if (numberLiteralType == Type.DECIMAL_LITERAL) {
 							this.numberLiteralType = Type.HEXADECIMAL_LITERAL;
 
-							buildingToken.clear();
+							buildingToken.setLength(0);
 
 							continue;
 						} else {
@@ -152,7 +158,7 @@ public class VenusLexer {
 
 					if (numberLiteralType == Type.BINARY_LITERAL) {
 						if (isLetter) {
-							if (!CharSet.BINARY.contains(ch)) {
+							if (ch=='0'||ch=='1') {
 								bye("Invalid binary character \"" + ch + "\"");
 							}
 						} else {
@@ -166,7 +172,7 @@ public class VenusLexer {
 						condition = !isDigit && ch != '.';
 					} else if (numberLiteralType == Type.HEXADECIMAL_LITERAL) {
 						if (isLetter) {
-							if (!CharSet.HEXADECIMAL.contains(ch)) {
+							if ((ch+"").matches("-?[0-9a-fA-F]+")) {
 								bye("Invalid hexadecimal character \"" + ch + "\"");
 							}
 						} else {
@@ -179,14 +185,18 @@ public class VenusLexer {
 
 						this.state = null;
 
-						return new Token(numberLiteralType, buildingToken.toStringAndClear());
+						Token token = new Token(numberLiteralType, buildingToken.toString());
+						buildingToken.setLength(0);
+						return token;
 					}
 				} else if (state != IN_CHAR_LITERAL && state != IN_STRING_LITERAL) {
 					if (ch == ' ' || ch == '\t') {
 						if (state == IN_NAME_DEFINITION) {
 							this.state = null;
 
-							return new Token(Type.NAME_DEFINITION, buildingToken.toStringAndClear());
+							Token token = new Token(Type.NAME_DEFINITION, buildingToken.toString());
+							buildingToken.setLength(0);
+							return token;
 						}
 
 						continue;
@@ -197,7 +207,9 @@ public class VenusLexer {
 
 						this.state = null;
 
-						return new Token(Type.NAME_DEFINITION, buildingToken.toStringAndClear());
+						Token token = new Token(Type.NAME_DEFINITION, buildingToken.toString());
+						buildingToken.setLength(0);
+						return token;
 					}
 
 					if (!isLetter && !isDigit) {
@@ -266,7 +278,7 @@ public class VenusLexer {
 				}
 
 				if (lastChar == '\\') {
-					buildingToken.append(StringWorker.unescape("\\" + ch));
+					buildingToken.append(unescapeJavaString("\\" + ch));
 					ch = 0;
 				} else if (ch != '\\') {
 					buildingToken.append(ch);
@@ -279,8 +291,79 @@ public class VenusLexer {
 		return null;
 	}
 
+	public String unescapeJavaString(String st) {
+
+		StringBuilder sb = new StringBuilder(st.length());
+
+		for (int i = 0; i < st.length(); i++) {
+			char ch = st.charAt(i);
+			if (ch == '\\') {
+				char nextChar = (i == st.length() - 1) ? '\\' : st
+						.charAt(i + 1);
+				// Octal escape?
+				if (nextChar >= '0' && nextChar <= '7') {
+					String code = "" + nextChar;
+					i++;
+					if ((i < st.length() - 1) && st.charAt(i + 1) >= '0'
+							&& st.charAt(i + 1) <= '7') {
+						code += st.charAt(i + 1);
+						i++;
+						if ((i < st.length() - 1) && st.charAt(i + 1) >= '0'
+								&& st.charAt(i + 1) <= '7') {
+							code += st.charAt(i + 1);
+							i++;
+						}
+					}
+					sb.append((char) Integer.parseInt(code, 8));
+					continue;
+				}
+				switch (nextChar) {
+					case '\\':
+						ch = '\\';
+						break;
+					case 'b':
+						ch = '\b';
+						break;
+					case 'f':
+						ch = '\f';
+						break;
+					case 'n':
+						ch = '\n';
+						break;
+					case 'r':
+						ch = '\r';
+						break;
+					case 't':
+						ch = '\t';
+						break;
+					case '\"':
+						ch = '\"';
+						break;
+					case '\'':
+						ch = '\'';
+						break;
+					// Hex Unicode: u????
+					case 'u':
+						if (i >= st.length() - 5) {
+							ch = 'u';
+							break;
+						}
+						int code = Integer.parseInt(
+								"" + st.charAt(i + 2) + st.charAt(i + 3)
+										+ st.charAt(i + 4) + st.charAt(i + 5), 16);
+						sb.append(Character.toChars(code));
+						i += 5;
+						continue;
+				}
+				i++;
+			}
+			sb.append(ch);
+		}
+		return sb.toString();
+	}
+
 	public void reRead(Token token) {
-		reread.push(token);
+		reread.add(token);
 	}
 
 	protected void back() {

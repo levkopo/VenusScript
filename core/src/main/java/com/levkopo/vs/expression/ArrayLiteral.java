@@ -1,24 +1,22 @@
 package com.levkopo.vs.expression;
 
-import com.github.bloodshura.ignitium.collection.view.XArrayView;
-import com.github.bloodshura.ignitium.collection.view.XView;
-import com.github.bloodshura.ignitium.util.XApi;
 import com.levkopo.vs.exception.runtime.ScriptRuntimeException;
 import com.levkopo.vs.executor.Context;
 import com.levkopo.vs.value.ArrayValue;
 import com.levkopo.vs.value.Value;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class ArrayLiteral implements Expression {
 	private final Expression[] expressions;
 
 	public ArrayLiteral(Expression... expressions) {
-		XApi.requireNonNull(expressions, "expressions");
-
 		this.expressions = expressions;
 	}
 
-	public XView<Expression> getExpressions() {
-		return new XArrayView<>(expressions);
+	public List<Expression> getExpressions() {
+		return Arrays.asList(expressions);
 	}
 
 	@Override

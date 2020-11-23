@@ -1,15 +1,8 @@
 package com.levkopo.vs.origin;
 
-import com.github.bloodshura.ignitium.charset.Encoding;
-import com.github.bloodshura.ignitium.io.File;
-import com.github.bloodshura.ignitium.io.FileException;
-
-import java.io.BufferedReader;
-import java.io.FileInputStream;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.reflect.Field;
-import java.nio.charset.Charset;
+import java.util.Scanner;
 
 public class FileScriptOrigin implements ScriptOrigin {
 	private final File file;
@@ -20,13 +13,10 @@ public class FileScriptOrigin implements ScriptOrigin {
 
 	@Override
 	public ScriptOrigin findRelative(String includePath) {
-		try {
-			File file = new File(getFile().getParent(), includePath);
+		File file = new File(getFile().getParent(), includePath);
 
-			if (file.exists()) {
-				return new FileScriptOrigin(file);
-			}
-		} catch (FileException ignored) {
+		if (file.exists()) {
+			return new FileScriptOrigin(file);
 		}
 
 		return ScriptOrigin.super.findRelative(includePath);
@@ -38,27 +28,27 @@ public class FileScriptOrigin implements ScriptOrigin {
 
 	@Override
 	public String getScriptName() {
-		return getFile().getFullName();
+		return getFile().getName();
 	}
 
 	@Override
 	public String read() throws IOException {
-		/*try {
-			System.setProperty("file.encoding","UTF-8");
-			Field charset = Charset.class.getDeclaredField("defaultCharset");
-			charset.setAccessible(true);
-			charset.set(null,null);
-		}catch (Exception ignored){}*/
+		Scanner reader = new Scanner(getFile());
 
-		String value = getFile().readString(Encoding.UTF_8);
-		value = value.replaceAll("\\r", "");
+		StringBuilder value = new StringBuilder();
+		while (reader.hasNextLine()) {
+			value.append(reader.nextLine()).append("\n");
+		}
+		reader.close();
 
 
-		if (value.startsWith("\uFEFF")) {
-			value = value.substring(1);
+		//Filter
+		value = new StringBuilder(value.toString().replaceAll("\\r", ""));
+		if (value.toString().startsWith("\uFEFF")) {
+			value = new StringBuilder(value.substring(1));
 		}
 
-		return value;
+		return value.toString();
 	}
 
 	@Override

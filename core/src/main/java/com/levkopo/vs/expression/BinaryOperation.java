@@ -1,17 +1,10 @@
 package com.levkopo.vs.expression;
 
-import com.github.bloodshura.ignitium.util.XApi;
 import com.levkopo.vs.exception.runtime.IncompatibleTypesException;
 import com.levkopo.vs.exception.runtime.ScriptRuntimeException;
 import com.levkopo.vs.executor.Context;
 import com.levkopo.vs.operator.BinaryOperator;
 import com.levkopo.vs.value.Value;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
-
-import java.util.Map;
-
-import static com.sun.xml.internal.ws.org.objectweb.asm.Opcodes.*;
-import static com.sun.xml.internal.ws.org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 
 public class BinaryOperation implements Expression {
 	private final Expression left;
@@ -19,10 +12,6 @@ public class BinaryOperation implements Expression {
 	private final Expression right;
 
 	public BinaryOperation(BinaryOperator operator, Expression left, Expression right) {
-		XApi.requireNonNull(left, "left");
-		XApi.requireNonNull(operator, "operator");
-		XApi.requireNonNull(right, "right");
-
 		this.left = left;
 		this.operator = operator;
 		this.right = right;

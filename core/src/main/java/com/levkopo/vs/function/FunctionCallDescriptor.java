@@ -1,18 +1,18 @@
 package com.levkopo.vs.function;
 
-import com.github.bloodshura.ignitium.collection.view.XView;
 import com.levkopo.vs.expression.Expression;
 import com.levkopo.vs.expression.FunctionCall;
 import com.levkopo.vs.value.Value;
 
+import java.util.List;
 import java.util.function.Function;
 
 public class FunctionCallDescriptor {
 	private final FunctionCall caller;
-	private final XView<Expression> expressions;
-	private final XView<Value> values;
+	private final List<Expression> expressions;
+	private final List<Value> values;
 
-	public FunctionCallDescriptor(FunctionCall caller, XView<Expression> expressions, XView<Value> values) {
+	public FunctionCallDescriptor(FunctionCall caller, List<Expression> expressions, List<Value> values) {
 		this.caller = caller;
 		this.expressions = expressions;
 		this.values = values;
@@ -34,11 +34,11 @@ public class FunctionCallDescriptor {
 		return index >= 0 && index < getValues().size() ? getValues().get(index) : value;
 	}
 
-	public XView<Expression> getExpressions() {
+	public List<Expression> getExpressions() {
 		return expressions;
 	}
 
-	public XView<Value> getValues() {
+	public List<Value> getValues() {
 		return values;
 	}
 

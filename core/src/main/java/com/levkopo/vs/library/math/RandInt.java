@@ -1,6 +1,5 @@
 package com.levkopo.vs.library.math;
 
-import com.github.bloodshura.ignitium.math.random.XRandom;
 import com.levkopo.vs.exception.runtime.ScriptRuntimeException;
 import com.levkopo.vs.executor.Context;
 import com.levkopo.vs.function.FunctionCallDescriptor;
@@ -9,6 +8,8 @@ import com.levkopo.vs.function.annotation.MethodArgs;
 import com.levkopo.vs.function.annotation.MethodName;
 import com.levkopo.vs.value.IntegerValue;
 import com.levkopo.vs.value.Value;
+
+import java.util.Random;
 
 @MethodArgs({ IntegerValue.class, IntegerValue.class })
 @MethodName("randInt")
@@ -27,6 +28,6 @@ public class RandInt extends Method {
 			minValue = temp;
 		}
 
-		return new IntegerValue(XRandom.INSTANCE.nextLong(minValue, maxValue));
+		return new IntegerValue(minValue + (long) (Math.random() * (maxValue - minValue)));
 	}
 }

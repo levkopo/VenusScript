@@ -1,9 +1,12 @@
 package com.levkopo.vs.operator;
 
-import com.github.bloodshura.ignitium.collection.view.XView;
-import com.github.bloodshura.ignitium.enumeration.Enumerations;
 import com.levkopo.vs.value.TypeValue;
 import com.levkopo.vs.value.Value;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 
 public class OperatorList {
 	public static final BinaryOperator AND = new BinaryOperator("and", Value::and, "&&", "&");
@@ -35,7 +38,15 @@ public class OperatorList {
 		return null;
 	}
 
-	public static XView<Operator> values() {
-		return Enumerations.values(OperatorList.class, Operator.class);
+	public static List<Operator> values() {
+		List<Operator> output = new ArrayList<>();
+
+		for (Field f : OperatorList.class.getDeclaredFields())
+			if (Modifier.isStatic(f.getModifiers()))
+				try {
+					output.add((Operator) f.get(OperatorList.class));
+				} catch (IllegalAccessException ignored) {}
+
+		return output;
 	}
 }

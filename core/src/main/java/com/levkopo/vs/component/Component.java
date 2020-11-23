@@ -1,7 +1,5 @@
 package com.levkopo.vs.component;
 
-import com.github.bloodshura.ignitium.lang.annotation.Internal;
-import com.github.bloodshura.ignitium.util.XApi;
 import com.levkopo.vs.executor.ApplicationContext;
 
 public abstract class Component {
@@ -9,8 +7,6 @@ public abstract class Component {
 	private int sourceLine;
 
 	public ApplicationContext getApplicationContext() {
-		XApi.requireState(getParent() != null, "Could not retrieve application context; no parent available");
-
 		return getParent().getApplicationContext();
 	}
 
@@ -19,8 +15,6 @@ public abstract class Component {
 	}
 
 	public Script getScript() {
-		XApi.requireState(getParent() != null, "Could not retrieve script; no parent available");
-
 		return getParent().getScript();
 	}
 
@@ -32,12 +26,10 @@ public abstract class Component {
 		return getParent() != null;
 	}
 
-	@Internal
 	public void setParent(Container parent) {
 		this.parent = parent;
 	}
 
-	@Internal
 	public void setSourceLine(int sourceLine) {
 		this.sourceLine = sourceLine;
 	}

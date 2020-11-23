@@ -1,8 +1,7 @@
 package com.levkopo.vs.operator;
 
-import com.github.bloodshura.ignitium.collection.view.XView;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
+import java.util.List;
 
 public interface Operator {
-	XView<String> getIdentifiers();
+	List<String> getIdentifiers();
 }

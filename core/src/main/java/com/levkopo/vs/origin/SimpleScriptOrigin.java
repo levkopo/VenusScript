@@ -17,7 +17,7 @@ public class SimpleScriptOrigin implements ScriptOrigin {
 	}
 
 	@Override
-	public String read() throws IOException {
+	public String read() {
 		return content;
 	}
 

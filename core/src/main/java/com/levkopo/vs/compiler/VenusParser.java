@@ -1,21 +1,12 @@
 package com.levkopo.vs.compiler;
 
-import com.github.bloodshura.ignitium.charset.TextBuilder;
-import com.github.bloodshura.ignitium.collection.list.XList;
-import com.github.bloodshura.ignitium.collection.list.impl.XArrayList;
-import com.github.bloodshura.ignitium.collection.map.XMap;
-import com.github.bloodshura.ignitium.collection.map.impl.XLinkedMap;
-import com.github.bloodshura.ignitium.math.BaseConverter;
-import com.levkopo.vs.component.AsyncContainer;
-import com.levkopo.vs.component.Component;
-import com.levkopo.vs.component.Container;
-import com.levkopo.vs.component.Script;
-import com.levkopo.vs.component.SimpleComponent;
-import com.levkopo.vs.component.SimpleContainer;
+import com.levkopo.vs.component.*;
+import com.levkopo.vs.component.branch.*;
 import com.levkopo.vs.component.object.Attribute;
 import com.levkopo.vs.component.object.ObjectDefinition;
 import com.levkopo.vs.exception.compile.ScriptCompileException;
 import com.levkopo.vs.exception.compile.UnexpectedTokenException;
+import com.levkopo.vs.expression.*;
 import com.levkopo.vs.function.Argument;
 import com.levkopo.vs.function.Definition;
 import com.levkopo.vs.library.VenusLibrary;
@@ -24,19 +15,11 @@ import com.levkopo.vs.operator.Operator;
 import com.levkopo.vs.operator.OperatorList;
 import com.levkopo.vs.type.PrimitiveType;
 import com.levkopo.vs.type.Type;
-import com.levkopo.vs.value.BoolValue;
-import com.levkopo.vs.value.DecimalValue;
-import com.levkopo.vs.value.FunctionRefValue;
-import com.levkopo.vs.value.IntegerValue;
-import com.levkopo.vs.value.StringValue;
-import com.levkopo.vs.value.TypeValue;
-import com.levkopo.vs.value.Value;
-import com.levkopo.vs.value.VariableRefValue;
-import com.github.bloodshura.ignitium.worker.ParseWorker;
-import com.levkopo.vs.component.branch.*;
-import com.levkopo.vs.expression.*;
+import com.levkopo.vs.value.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -216,14 +199,14 @@ public class VenusParser {
 			AsyncContainer asyncContainer = new AsyncContainer(nextDaemon);
 
 			asyncContainer.setSourceLine(lexer.currentLine());
-			container.getChildren().add(asyncContainer);
-			asyncContainer.getChildren().add(component);
+			container.addChildren(asyncContainer);
+			asyncContainer.addChildren(component);
 
 			this.nextAsyncable = false;
 			this.nextDaemon = false;
 		} else {
 			component.setSourceLine(lexer.currentLine());
-			container.getChildren().add(component);
+			container.addChildren(component);
 		}
 	}
 
@@ -261,7 +244,7 @@ public class VenusParser {
 
 		if (token.getType() == Token.Type.BINARY_LITERAL) {
 			try {
-				return new IntegerValue(BaseConverter.encodeToLong(value, BaseConverter.BINARY));
+				return new IntegerValue(Long.parseLong(value));
 			} catch (NumberFormatException exception) {
 				bye(token, "illegal binary value \"" + value + "\"");
 			}
@@ -290,12 +273,12 @@ public class VenusParser {
 		}
 
 		if (token.getType() == Token.Type.DECIMAL_LITERAL) {
-			if (ParseWorker.isLong(value)) {
-				return new IntegerValue(ParseWorker.toLong(value));
-			}
-
-			if (ParseWorker.isDouble(value)) {
-				return new DecimalValue(ParseWorker.toDouble(value));
+			try {
+				return new DecimalValue(Double.parseDouble(value));
+			}catch(NumberFormatException e) {
+				try {
+					return new IntegerValue(Long.parseLong(value));
+				}catch(NumberFormatException ignored) {}
 			}
 
 			bye(token, "illegal decimal value \"" + value + "\"");
@@ -303,7 +286,7 @@ public class VenusParser {
 
 		if (token.getType() == Token.Type.HEXADECIMAL_LITERAL) {
 			try {
-				return new IntegerValue(BaseConverter.encodeToLong(value, BaseConverter.HEXADECIMAL));
+				return new IntegerValue(Long.parseLong(value.substring(2)));
 			} catch (NumberFormatException exception) {
 				bye(token, "illegal hexadecimal value \"" + value + "\"");
 			}
@@ -377,7 +360,7 @@ public class VenusParser {
 	protected void parseDefinition(boolean isGlobal) throws ScriptCompileException {
 		Token typeToken = requireToken(Token.Type.NAME_DEFINITION, "expected a definition name");
 		String definitionName = typeToken.getValue();
-		XList<Argument> arguments = new XArrayList<>();
+		List<Argument> arguments = new ArrayList<>();
 
 		requireToken(Token.Type.OPEN_PARENTHESE, "expected an open parenthese");
 
@@ -407,7 +390,7 @@ public class VenusParser {
 						bye(argumentToken, "argument name cannot be a keyword");
 					}
 				} else {
-					bye(reading, "expected an argument value type (" + PrimitiveType.values().toString(", ") + ") or object type");
+					bye(reading, "expected an argument value type (" + PrimitiveType.values().toString() + ") or object type");
 				}
 			} else {
 				bye(reading, "expected an argument name");
@@ -752,7 +735,7 @@ public class VenusParser {
 
 					requireToken(Token.Type.OPEN_PARENTHESE, "expected an open parenthese");
 
-					XMap<String, Expression> attributes = new XLinkedMap<>();
+					Map<String, Expression> attributes = new HashMap<>();
 
 					while (true) {
 						Token t = requireToken();
@@ -766,7 +749,7 @@ public class VenusParser {
 
 							Expression attribExpression = readExpression(o -> o.getType() != Token.Type.COMMA && o.getType() != Token.Type.CLOSE_PARENTHESE, o -> o.getType() == Token.Type.CLOSE_PARENTHESE);
 
-							attributes.add(t.getValue(), attribExpression);
+							attributes.put(t.getValue(), attribExpression);
 						} else {
 							bye(t, "expected an attribute name");
 						}
@@ -828,7 +811,7 @@ public class VenusParser {
 
 	// This also consumes the last 'end' token
 	protected Expression[] readExpressions(Token.Type separator, Token.Type end) throws ScriptCompileException {
-		XList<Expression> result = new XArrayList<>();
+		List<Expression> result = new ArrayList<>();
 		Token token;
 
 		while ((token = requireToken()).getType() != end) {
@@ -836,7 +819,7 @@ public class VenusParser {
 			result.add(readExpression(t -> t.getType() != end && t.getType() != separator, t -> t.getType() == end));
 		}
 
-		return result.toArray();
+		return result.toArray(new Expression[result.size()]);
 	}
 
 	protected Expression[] readFunctionArguments() throws ScriptCompileException {
@@ -844,7 +827,7 @@ public class VenusParser {
 	}
 
 	protected String readOperator(String start) throws ScriptCompileException {
-		TextBuilder operatorStr = new TextBuilder();
+		StringBuilder operatorStr = new StringBuilder();
 		Token operatorToken;
 
 		if (start != null) {
@@ -854,7 +837,7 @@ public class VenusParser {
 		while ((operatorToken = requireToken()).getType() == Token.Type.OPERATOR) {
 			String op = operatorToken.getValue();
 
-			if (OperatorList.forIdentifier(op, true) != null && !operatorStr.isEmpty()) {
+			if (OperatorList.forIdentifier(op, true) != null && !operatorStr.toString().trim().isEmpty()) {
 				break;
 			}
 
@@ -863,7 +846,7 @@ public class VenusParser {
 
 		lexer.reRead(operatorToken); // Last token have type != OPERATOR
 
-		return operatorStr.toStringAndClear();
+		return operatorStr.toString().trim();
 	}
 
 	protected Value readValue() throws ScriptCompileException {

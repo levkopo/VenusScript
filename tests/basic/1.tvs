@@ -1,0 +1,26 @@
+using std
+
+def test(){
+    print("ok ")
+}
+
+def ArgsTest(string ok){
+    print(ok)
+}
+
+def testReturn(): string{
+    return "1"
+}
+
+def argReturn(any value): any{
+    return value
+}
+
+test()
+println(testReturn())
+ArgsTest("ok ")
+println(argReturn("2"))
+
+--
+ok 1
+ok 2

@@ -24,13 +24,31 @@ println(*f)
 println(*g)
 println(*h)
 println(*i)
-println("Running assertions...")
-assert((*a) == (*string))
-assert((*b) == (*decimal))
-assert((*c) == (*int))
-assert((*d) == (*string))
-assert((*e) == (*bool))
-assert((*f) == (*bool))
-assert((*g) == (*type))
-assert((*h) == (*type))
-assert((*i) == (*any))
+println((*a) == (*string))
+println((*b) == (*decimal))
+println((*c) == (*int))
+println((*d) == (*string))
+println((*e) == (*bool))
+println((*f) == (*bool))
+println((*g) == (*type))
+println((*h) == (*any))
+println((*i) == (*any))
+--
+string
+decimal
+decimal
+string
+bool
+bool
+type
+type
+any
+true
+true
+false
+true
+true
+true
+true
+false
+true

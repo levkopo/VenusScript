@@ -1,101 +1,88 @@
 package com.levkopo.vs.test;
 
-import com.github.bloodshura.ignitium.activity.logging.XLogger;
-import com.github.bloodshura.ignitium.activity.scanning.XScanner;
-import com.github.bloodshura.ignitium.collection.view.XView;
-import com.github.bloodshura.ignitium.io.Directory;
-import com.github.bloodshura.ignitium.io.File;
-import com.github.bloodshura.ignitium.worker.ParseWorker;
-import com.levkopo.vs.component.Component;
-import com.levkopo.vs.component.Container;
 import com.levkopo.vs.component.Script;
 import com.levkopo.vs.exception.compile.ScriptCompileException;
-import com.levkopo.vs.exception.runtime.ScriptRuntimeException;
 import com.levkopo.vs.executor.ApplicationContext;
+import com.levkopo.vs.executor.OutputReference;
 import com.levkopo.vs.executor.VenusExecutor;
 import com.levkopo.vs.origin.FileScriptOrigin;
 import com.levkopo.vs.origin.ScriptMode;
 import com.levkopo.vs.origin.ScriptOrigin;
+import com.levkopo.vs.origin.SimpleScriptOrigin;
 
-import static com.github.bloodshura.ignitium.sys.XSystem.*;
+import java.io.File;
+import java.util.Objects;
+import java.util.Scanner;
 
 public class InteractiveTester {
-	public static final Directory DIRECTORY = new Directory("./examples");
+	//public static final Directory DIRECTORY = new Directory("./examples");
 	public static final boolean LIGHTWEIGHT_ERRORS = false;
 
 	public static void main(String[] args) throws Exception {
-		XView<File> files = DIRECTORY.getDeepFiles();
+		File[] dirs = new File("./tests").listFiles();
 		int i = 0;
 
-		for (File file : files) {
-			XLogger.println(i++ + ". " + file.getRelativePath(DIRECTORY));
+		for (File file : dirs) {
+			System.out.println(i++ + ". " + file.getName());
 		}
 
-		XLogger.print("> ");
+		System.out.print("> ");
 
 		int option = -1;
-		boolean printAst = false;
+		while (option < 0 || option >= dirs.length) {
+			String optionStr = new Scanner(System.in).next();
 
-		while (option < 0 || option >= files.size()) {
-			String optionStr = XScanner.scan();
-
-			if (optionStr.startsWith("*")) {
-				optionStr = optionStr.substring(1);
-				printAst = true;
-			}
-
-			if (ParseWorker.isInt(optionStr)) {
-				option = ParseWorker.toInt(optionStr);
-			}
+			try{
+				option = Integer.parseInt(optionStr);
+			}catch (Exception ignored){}
 		}
 
-		File file = files.get(option);
-		ScriptOrigin origin = new FileScriptOrigin(file);
-		Script script;
+		StringBuilder output = new StringBuilder();
+		ApplicationContext ctx = new ApplicationContext();
+		ctx.setUserData("out", (OutputReference) output::append);
 
-		if (LIGHTWEIGHT_ERRORS) {
+		int completed = 0;
+		for(File file: Objects.requireNonNull(dirs[option].listFiles())){
+			System.out.println();
+			System.out.println("Test: "+file.getName());
+
+			String content = new FileScriptOrigin(file).read();
+			SimpleScriptOrigin origin = new SimpleScriptOrigin(file.getName(), content.split("--")[0]);
+			Script script;
+
+			if (LIGHTWEIGHT_ERRORS) {
+				try {
+					script = origin.compile(ctx);
+				} catch (ScriptCompileException exception) {
+					exception.printStackTrace();
+					return;
+				}
+			} else {
+				script = origin.compile(ctx);
+			}
+
+			VenusExecutor executor = new VenusExecutor();
+			long start = System.currentTimeMillis();
+
 			try {
-				script = origin.compile(new ApplicationContext());
-			} catch (ScriptCompileException exception) {
-				XLogger.warnln("COMPILE ERR: " + exception.getMessage());
-
-				return;
-			}
-		} else {
-			script = origin.compile(new ApplicationContext());
-		}
-
-		if (printAst) {
-			print(script);
-			XLogger.newLine();
-		}
-
-		VenusExecutor executor = new VenusExecutor();
-		long start = millis();
-
-		try {
-			executor.run(script, ScriptMode.NORMAL);
-		} catch (Exception e){
-			e.printStackTrace();
-		}
-
-		long duration = millis() - start;
-
-		XLogger.println("Duration: " + duration + "ms");
-		System.exit(0);
-	}
-
-	private static void print(Component component) {
-		XLogger.println(component);
-
-		if (component instanceof Container) {
-			XLogger.pushTab();
-
-			for (Component child : ((Container) component).getChildren()) {
-				print(child);
+				executor.run(script, ScriptMode.NORMAL);
+			} catch (Exception e){
+				e.printStackTrace();
 			}
 
-			XLogger.popTab();
+			long duration = System.currentTimeMillis() - start;
+			if(!output.toString().trim().equals(content.split("--")[1].trim())){
+				System.out.println("Fail! Output: \""+output.toString().trim()+"\"");
+			}else{
+				System.out.println("Done!");
+				completed++;
+			}
+
+			output.setLength(0);
+			System.out.println("Duration: " + duration + "ms");
+			System.out.println();
 		}
+
+		System.out.println("Result: "+completed+"/"+Objects.requireNonNull(dirs[option].listFiles()).length);
 	}
 }

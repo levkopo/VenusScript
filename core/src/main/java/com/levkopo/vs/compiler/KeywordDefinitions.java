@@ -1,7 +1,9 @@
 package com.levkopo.vs.compiler;
 
-import com.github.bloodshura.ignitium.collection.view.XView;
-import com.github.bloodshura.ignitium.enumeration.Enumerations;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 
 public class KeywordDefinitions {
 	public static final String ASYNC = "async";
@@ -28,13 +30,20 @@ public class KeywordDefinitions {
 	public static final String TRUE = "true";
 	public static final String USING = "using";
 	public static final String WHILE = "while";
-	public static final String MAP_VALUE_DELIMETER = "=>";
 
 	public static boolean isKeyword(String definition) {
 		return values().contains(definition);
 	}
 
-	public static XView<String> values() {
-		return Enumerations.values(KeywordDefinitions.class, String.class);
+	public static List<String> values() {
+		List<String> output = new ArrayList<>();
+
+		for (Field f : KeywordDefinitions.class.getDeclaredFields())
+			if (Modifier.isStatic(f.getModifiers())&&f.getType().equals(String.class))
+				try {
+					output.add((String) f.get(KeywordDefinitions.class));
+				} catch (IllegalAccessException ignored) {}
+
+		return output;
 	}
 }

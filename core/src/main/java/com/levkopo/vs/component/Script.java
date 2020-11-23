@@ -1,9 +1,5 @@
 package com.levkopo.vs.component;
 
-import com.github.bloodshura.ignitium.activity.logging.XLogger;
-import com.github.bloodshura.ignitium.collection.list.XList;
-import com.github.bloodshura.ignitium.collection.list.impl.XArrayList;
-import com.github.bloodshura.ignitium.collection.view.XView;
 import com.levkopo.vs.compiler.VenusParser;
 import com.levkopo.vs.exception.compile.ScriptCompileException;
 import com.levkopo.vs.exception.runtime.ScriptRuntimeException;
@@ -14,9 +10,12 @@ import com.levkopo.vs.library.LibraryList;
 import com.levkopo.vs.origin.ScriptOrigin;
 import com.levkopo.vs.type.Type;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Script extends Container {
 	private final ApplicationContext appContext;
-	private final XList<Script> includes;
+	private final List<Script> includes;
 	private final LibraryList libraryList;
 	private final ScriptOrigin origin;
 	private final VenusParser parser;
@@ -24,14 +23,14 @@ public class Script extends Container {
 	public Script(ApplicationContext appContext, ScriptOrigin origin) {
 		this.appContext = appContext;
 		this.context = new Context(this, null);
-		this.includes = new XArrayList<>();
+		this.includes = new ArrayList<>();
 		this.libraryList = new LibraryList();
 		this.origin = origin;
 		this.parser = new VenusParser(this);
 	}
 
 	@Override
-	public Function findFunction(Context context, String name, XView<Type> argumentTypes) throws ScriptRuntimeException {
+	public Function findFunction(Context context, String name, List<Type> argumentTypes) throws ScriptRuntimeException {
 		try {
 			return super.findFunction(context, name, argumentTypes);
 		} catch (ScriptRuntimeException exception) {
@@ -61,7 +60,7 @@ public class Script extends Container {
 		return getOrigin().getScriptName();
 	}
 
-	public XList<Script> getIncludes() {
+	public List<Script> getIncludes() {
 		return includes;
 	}
 
@@ -89,9 +88,7 @@ public class Script extends Container {
 			Script script = origin.compile(getApplicationContext());
 
 			getIncludes().add(script);
-		} else if (maybe) {
-			XLogger.debugln("Not found include script \"" + includePath + "\", but it was marked as maybe.");
-		} else {
+		}else {
 			throw new ScriptCompileException("Could not find script \"" + includePath + "\"");
 		}
 	}

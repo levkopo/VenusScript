@@ -1,10 +1,9 @@
 package com.levkopo.vs.exception.compile;
 
-import com.github.bloodshura.ignitium.exception.CheckedException;
 
-public class ScriptCompileException extends CheckedException {
+public class ScriptCompileException extends Exception {
 	public ScriptCompileException(CharSequence message) {
-		super(message);
+		super((String) message);
 	}
 
 	public ScriptCompileException(String scriptName, int currentLine, CharSequence message) {

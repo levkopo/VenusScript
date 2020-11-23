@@ -1,15 +1,14 @@
 package com.levkopo.vs.library;
 
-import com.github.bloodshura.ignitium.collection.list.impl.XArrayList;
-import com.github.bloodshura.ignitium.collection.map.XMap;
-import com.github.bloodshura.ignitium.collection.map.impl.XLinkedMap;
 import com.levkopo.vs.component.object.ObjectDefinition;
 import com.levkopo.vs.function.Function;
 
+import java.util.ArrayList;
+
 public class VSLibrary{
 
-    public final XArrayList<Function> functions = new XArrayList<>();
-    public final XArrayList<ObjectDefinition> objects = new XArrayList<>();
+    public final ArrayList<Function> functions = new ArrayList<>();
+    public final ArrayList<ObjectDefinition> objects = new ArrayList<>();
 
     public boolean addFunction(Class<? extends Function> object) {
         try {

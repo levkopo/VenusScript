@@ -1,11 +1,9 @@
 package com.levkopo.vs.component.object;
 
-import com.github.bloodshura.ignitium.object.Base;
 import com.levkopo.vs.expression.Expression;
+import com.sun.istack.internal.NotNull;
 
-import javax.annotation.Nonnull;
-
-public class Attribute extends Base {
+public class Attribute {
 	private final Expression defaultExpression;
 	private final String name;
 
@@ -26,8 +24,7 @@ public class Attribute extends Base {
 		return getDefaultExpression() != null;
 	}
 
-	@Nonnull
-	@Override
+	@NotNull
 	protected Object[] stringValues() {
 		return new Object[] { getName(), getDefaultExpression() };
 	}

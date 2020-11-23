@@ -1,7 +1,5 @@
 package com.levkopo.vs.library.std;
 
-import com.github.bloodshura.ignitium.activity.logging.Logger;
-import com.github.bloodshura.ignitium.activity.scanning.XScanner;
 import com.levkopo.vs.exception.runtime.InvalidValueTypeException;
 import com.levkopo.vs.exception.runtime.ScriptRuntimeException;
 import com.levkopo.vs.executor.Context;
@@ -11,20 +9,16 @@ import com.levkopo.vs.function.annotation.MethodArgs;
 import com.levkopo.vs.function.annotation.MethodName;
 import com.levkopo.vs.type.PrimitiveType;
 import com.levkopo.vs.type.Type;
-import com.levkopo.vs.value.BoolValue;
-import com.levkopo.vs.value.DecimalValue;
-import com.levkopo.vs.value.IntegerValue;
-import com.levkopo.vs.value.StringValue;
-import com.levkopo.vs.value.TypeValue;
-import com.levkopo.vs.value.Value;
-import com.github.bloodshura.ignitium.worker.ParseWorker;
+import com.levkopo.vs.value.*;
+
+import java.util.Scanner;
 
 @MethodArgs(TypeValue.class)
 @MethodName("scan")
 public class Scan extends Method {
 	@Override
 	public Value call(Context context, FunctionCallDescriptor descriptor) throws ScriptRuntimeException {
-		Logger logger = context.getApplicationContext().getUserData("in", Logger.class);
+		Scanner logger = context.getApplicationContext().getUserData("in", Scanner.class);
 
 		if (logger != null) {
 			TypeValue value = (TypeValue) descriptor.get(0);
@@ -32,18 +26,18 @@ public class Scan extends Method {
 
 			while (true) {
 				try {
-					String line = XScanner.scan();
+					String line = logger.nextLine();
 
 					if (type == PrimitiveType.BOOLEAN) {
-						return new BoolValue(ParseWorker.toBoolean(line));
+						return new BoolValue(Boolean.parseBoolean(line));
 					}
 
 					if (type == PrimitiveType.DECIMAL) {
-						return new DecimalValue(ParseWorker.toDouble(line));
+						return new DecimalValue(Double.parseDouble(line));
 					}
 
 					if (type == PrimitiveType.INTEGER) {
-						return new IntegerValue(ParseWorker.toLong(line));
+						return new IntegerValue(Long.parseLong(line));
 					}
 
 					if (type == PrimitiveType.STRING) {

@@ -1,12 +1,12 @@
 package com.levkopo.vs.origin;
 
-import com.github.bloodshura.ignitium.resource.PathResource;
 import com.levkopo.vs.compiler.VenusLexer;
 import com.levkopo.vs.compiler.VenusParser;
 import com.levkopo.vs.component.Script;
 import com.levkopo.vs.exception.compile.ScriptCompileException;
 import com.levkopo.vs.executor.ApplicationContext;
 
+import java.io.File;
 import java.io.IOException;
 
 public interface ScriptOrigin {
@@ -28,9 +28,9 @@ public interface ScriptOrigin {
 	}
 
 	default ScriptOrigin findRelative(String includePath) {
-		PathResource resource = new PathResource(includePath);
+		File file = new File(includePath);
 
-		return resource.exists() ? new StreamScriptOrigin(includePath, resource) : null;
+		return file.exists() ? new FileScriptOrigin(file) : null;
 	}
 
 	String getScriptName();

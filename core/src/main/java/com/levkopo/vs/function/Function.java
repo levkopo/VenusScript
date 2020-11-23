@@ -1,18 +1,16 @@
 package com.levkopo.vs.function;
 
-import com.github.bloodshura.ignitium.collection.view.XView;
-import com.github.bloodshura.ignitium.lang.Nameable;
-import com.github.bloodshura.ignitium.util.XApi;
 import com.levkopo.vs.exception.runtime.ScriptRuntimeException;
 import com.levkopo.vs.executor.Context;
 import com.levkopo.vs.type.PrimitiveType;
 import com.levkopo.vs.type.Type;
 import com.levkopo.vs.value.Value;
 
-public interface Function extends Nameable {
-	default boolean accepts(String name, XView<Type> argumentTypes) {
-		XApi.requireNonNull(name, "name");
+import java.util.List;
 
+public interface Function {
+
+	default boolean accepts(String name, List<Type> argumentTypes) {
 		if (getName().equals(name)) {
 			if (argumentTypes == null) {
 				return true;
@@ -29,13 +27,13 @@ public interface Function extends Nameable {
 				}
 
 				return true;
-			} else if (isVarArgs()) {
-				return true;
-			}
+			} else return isVarArgs();
 		}
 
 		return false;
 	}
+
+	String getName();
 
 	Value call(Context context, FunctionCallDescriptor descriptor) throws ScriptRuntimeException;
 
@@ -43,7 +41,7 @@ public interface Function extends Nameable {
 		return getArgumentTypes().size();
 	}
 
-	XView<Type> getArgumentTypes();
+	List<Type> getArgumentTypes();
 
 	boolean isVarArgs();
 }

@@ -1,9 +1,5 @@
 package com.levkopo.vs.component;
 
-import com.github.bloodshura.ignitium.collection.list.XList;
-import com.github.bloodshura.ignitium.collection.list.impl.XArrayList;
-import com.github.bloodshura.ignitium.collection.view.XView;
-import com.github.bloodshura.ignitium.util.XApi;
 import com.levkopo.vs.component.object.ObjectDefinition;
 import com.levkopo.vs.exception.runtime.ScriptRuntimeException;
 import com.levkopo.vs.exception.runtime.UndefinedFunctionException;
@@ -15,19 +11,18 @@ import com.levkopo.vs.type.Type;
 import com.levkopo.vs.value.FunctionRefValue;
 import com.levkopo.vs.value.Value;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class Container extends Component {
 	protected Context context;
-	private final XList<Component> children;
+	private final List<Component> children;
 
 	public Container() {
-		this.children = new XArrayList<>();
-
-		getChildren().addInsertionListener(component -> component.setParent(this));
+		this.children = new ArrayList<>();
 	}
 
-	public Function findFunction(Context context, String name, XView<Type> argumentTypes) throws ScriptRuntimeException {
-		XApi.requireNonNull(name, "name");
-
+	public Function findFunction(Context context, String name, List<Type> argumentTypes) throws ScriptRuntimeException {
 		if (context.hasVar(name)) {
 			Value value = context.getVarValue(name); // Should not need to catch UndefinedVariableException since we already
 			// checked that the variable exists
@@ -40,12 +35,15 @@ public abstract class Container extends Component {
 
 		Definition foundVarArgs = null;
 
-		for (Definition definition : getChildren().selectType(Definition.class)) {
-			if (definition.accepts(name, argumentTypes)) {
-				if (definition.isVarArgs()) {
-					foundVarArgs = definition;
-				} else {
-					return definition;
+		for(Component component: getChildren()){
+			if(component instanceof Definition){
+				Definition definition = (Definition) component;
+				if (definition.accepts(name, argumentTypes)) {
+					if (definition.isVarArgs()) {
+						foundVarArgs = definition;
+					} else {
+						return definition;
+					}
 				}
 			}
 		}
@@ -65,9 +63,12 @@ public abstract class Container extends Component {
 	}
 
 	public ObjectDefinition findObjectDefinition(Context context, String name) throws ScriptRuntimeException {
-		for (ObjectDefinition definition : getChildren().selectType(ObjectDefinition.class)) {
-			if (definition.getName().equals(name)) {
-				return definition;
+		for(Component component: getChildren()){
+			if(component instanceof ObjectDefinition){
+				ObjectDefinition definition = (ObjectDefinition) component;
+				if (definition.getName().equals(name)) {
+					return definition;
+				}
 			}
 		}
 
@@ -84,9 +85,12 @@ public abstract class Container extends Component {
 	}
 
 	public Type findType(Context context, String name) throws ScriptRuntimeException {
-		for (ObjectDefinition definition : getChildren().selectType(ObjectDefinition.class)) {
-			if (definition.getName().equals(name)) {
-				return definition.getType();
+		for(Component component: getChildren()){
+			if(component instanceof ObjectDefinition){
+				ObjectDefinition definition = (ObjectDefinition) component;
+				if (definition.getName().equals(name)) {
+					return definition.getType();
+				}
 			}
 		}
 
@@ -100,8 +104,13 @@ public abstract class Container extends Component {
 		throw new UndefinedValueTypeException(context, name);
 	}
 
-	public XList<Component> getChildren() {
+	public List<Component> getChildren() {
 		return children;
+	}
+
+	public void addChildren(Component component) {
+		component.setParent(this);
+		children.add(component);
 	}
 
 	public Context getContext() {

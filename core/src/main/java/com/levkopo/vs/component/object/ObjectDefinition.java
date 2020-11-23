@@ -1,24 +1,25 @@
 package com.levkopo.vs.component.object;
 
-import com.github.bloodshura.ignitium.collection.list.XList;
-import com.github.bloodshura.ignitium.collection.list.impl.XArrayList;
 import com.levkopo.vs.component.Container;
 import com.levkopo.vs.executor.Context;
 import com.levkopo.vs.type.ObjectType;
 import com.levkopo.vs.type.Type;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ObjectDefinition extends Container {
-	private final XList<Attribute> attributes;
+	private final List<Attribute> attributes;
 	private final String name;
 	private final Type type;
 
 	public ObjectDefinition(String name) {
-		this.attributes = new XArrayList<>();
+		this.attributes = new ArrayList<>();
 		this.name = name;
 		this.type = new ObjectType(name);
 	}
 
-	public XList<Attribute> getAttributes() {
+	public List<Attribute> getAttributes() {
 		return attributes;
 	}
 

@@ -1,8 +1,5 @@
 package com.levkopo.vs.compiler;
 
-import com.github.bloodshura.ignitium.collection.list.XList;
-import com.github.bloodshura.ignitium.collection.list.impl.XArrayList;
-import com.github.bloodshura.ignitium.io.File;
 import com.levkopo.vs.BytecodeContext;
 import com.levkopo.vs.component.Component;
 import com.levkopo.vs.component.Script;
@@ -13,9 +10,13 @@ import com.levkopo.vs.origin.FileScriptOrigin;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 public class BytecodeCompiler {
 
-    public XList<ObjectDefinition> findClassesInFile(String path) throws ScriptCompileException {
+    public List<ObjectDefinition> findClassesInFile(String path) throws ScriptCompileException {
         String filename = path;
         if(filename.lastIndexOf("\\")!=-1)
             filename = filename.substring(filename.lastIndexOf("\\")+1);
@@ -23,7 +24,7 @@ public class BytecodeCompiler {
         FileScriptOrigin origin = new FileScriptOrigin(new File(path));
         Script script = origin.compile(new BytecodeContext());
         ObjectDefinition topLevelClass = new ObjectDefinition(filename.substring(0, filename.indexOf(".")));
-        XList<ObjectDefinition> classes = new XArrayList<>();
+        List<ObjectDefinition> classes = new ArrayList<>();
 
         for(Component c : script.getChildren()){
             if(c instanceof ObjectDefinition){

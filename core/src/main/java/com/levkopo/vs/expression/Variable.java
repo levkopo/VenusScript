@@ -1,6 +1,5 @@
 package com.levkopo.vs.expression;
 
-import com.github.bloodshura.ignitium.util.XApi;
 import com.levkopo.vs.exception.runtime.ScriptRuntimeException;
 import com.levkopo.vs.executor.Context;
 import com.levkopo.vs.value.Value;
@@ -15,8 +14,6 @@ public class Variable implements Expression {
 	private final String name;
 
 	public Variable(String name) {
-		XApi.requireNonNull(name, "name");
-
 		this.name = name;
 	}
 

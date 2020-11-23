@@ -1,7 +1,5 @@
 package com.levkopo.vs.library.json;
 
-import com.github.bloodshura.ignitium.cfg.json.JsonArray;
-import com.github.bloodshura.ignitium.cfg.json.JsonObject;
 import com.levkopo.vs.exception.runtime.ScriptRuntimeException;
 import com.levkopo.vs.executor.Context;
 import com.levkopo.vs.function.FunctionCallDescriptor;
@@ -13,6 +11,8 @@ import com.levkopo.vs.value.BoolValue;
 import com.levkopo.vs.value.MapValue;
 import com.levkopo.vs.value.StringValue;
 import com.levkopo.vs.value.Value;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 @MethodName("jsonEncode")
 @MethodVarArgs
@@ -21,16 +21,19 @@ public class JSONEncode extends Method {
 	@Override
 	public Value call(Context context, FunctionCallDescriptor descriptor) throws ScriptRuntimeException {
 		Value value = descriptor.get(0);
-		if(value instanceof ArrayValue)
-			return new StringValue(parseArray((ArrayValue) value).toString(false));
-		else if(value instanceof MapValue)
-			return new StringValue(parseMap((MapValue) value).toString(false));
+
+		try {
+			if (value instanceof ArrayValue)
+				return new StringValue(parseArray((ArrayValue) value).toString());
+			else if (value instanceof MapValue)
+				return new StringValue(parseMap((MapValue) value).toString());
+		}catch (Exception ignored){}
 
 		return new BoolValue(false);
 	}
 
-	public JsonArray parseArray(ArrayValue array){
-		JsonArray array_ = new JsonArray();
+	public JSONArray parseArray(ArrayValue array){
+		JSONArray array_ = new JSONArray();
 		for (Value value: array){
 			Object value_ = value.value();
 			if(value instanceof ArrayValue)
@@ -38,14 +41,14 @@ public class JSONEncode extends Method {
 			else if(value instanceof MapValue)
 				value_ = parseMap((MapValue) value);
 
-			array_.add(value_);
+			array_.put(value_);
 		}
 
 		return array_;
 	}
 
-	public JsonObject parseMap(MapValue map){
-		JsonObject object = new JsonObject();
+	public JSONObject parseMap(MapValue map){
+		JSONObject object = new JSONObject();
 		for(Object key: map.getMap().keySet()){
 			Value value = map.getMap().get(key);
 			Object value_ = value.value();
@@ -54,7 +57,7 @@ public class JSONEncode extends Method {
 			else if(value instanceof MapValue)
 				value_ = parseMap((MapValue) value);
 
-			object.set(key.toString(), value_);
+			object.put(key.toString(), value_);
 		}
 
 		return object;

@@ -1,9 +1,5 @@
 package com.levkopo.vs.library.math;
 
-import com.github.bloodshura.ignitium.collection.list.XList;
-import com.github.bloodshura.ignitium.collection.list.impl.XArrayList;
-import com.github.bloodshura.ignitium.collection.view.XBasicView;
-import com.github.bloodshura.ignitium.collection.view.XView;
 import com.levkopo.vs.exception.runtime.ScriptRuntimeException;
 import com.levkopo.vs.executor.Context;
 import com.levkopo.vs.function.Function;
@@ -12,19 +8,20 @@ import com.levkopo.vs.type.PrimitiveType;
 import com.levkopo.vs.type.Type;
 import com.levkopo.vs.value.IntegerValue;
 import com.levkopo.vs.value.Value;
-import com.github.bloodshura.ignitium.worker.UtilWorker;
+import com.sun.istack.internal.NotNull;
 
-import javax.annotation.Nonnull;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MathFunction implements Function {
-	private final XList<Type> arguments;
+	private final List<Type> arguments;
 	private final Method method;
 	private final String name;
 
 	public MathFunction(Method method) {
-		this.arguments = new XArrayList<>();
+		this.arguments = new ArrayList<>();
 		this.method = method;
 		this.name = method.getName();
 
@@ -35,11 +32,11 @@ public class MathFunction implements Function {
 
 	@Override
 	public Value call(Context context, FunctionCallDescriptor descriptor) throws ScriptRuntimeException {
-		XList<Object> values = new XArrayList<>();
+		List<Object> values = new ArrayList<>();
 		int i = 0;
 
 		for (Value argument : descriptor.getValues()) {
-			if (argument instanceof IntegerValue && UtilWorker.fixPrimitiveClass(method.getParameterTypes()[i]) == Integer.class) {
+			if (argument instanceof IntegerValue && method.getParameterTypes()[i] == Integer.class) {
 				values.add(((Long) argument.value()).intValue());
 			} else {
 				values.add(argument.value());
@@ -68,15 +65,15 @@ public class MathFunction implements Function {
 	}
 
 	@Override
-	public XView<Type> getArgumentTypes() {
-		return new XBasicView<>(arguments);
+	public List<Type> getArgumentTypes() {
+		return arguments;
 	}
 
 	public Method getMethod() {
 		return method;
 	}
 
-	@Nonnull
+	@NotNull
 	@Override
 	public String getName() {
 		return name;

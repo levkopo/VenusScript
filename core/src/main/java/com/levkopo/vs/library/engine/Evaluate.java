@@ -1,6 +1,5 @@
 package com.levkopo.vs.library.engine;
 
-import com.github.bloodshura.ignitium.charset.TextBuilder;
 import com.levkopo.vs.compiler.VenusLexer;
 import com.levkopo.vs.compiler.VenusParser;
 import com.levkopo.vs.component.SimpleContainer;
@@ -24,11 +23,11 @@ public class Evaluate extends Method {
 	@Override
 	public Value call(Context context, FunctionCallDescriptor descriptor) throws ScriptRuntimeException {
 		VenusParser parser = context.getScript().getParser();
-		TextBuilder builder = new TextBuilder();
+		StringBuilder builder = new StringBuilder();
 
-		builder.appendln(descriptor.getValues());
+		builder.append(descriptor.getValues()).append("\n");
 
-		String source = builder.toStringAndClear();
+		String source = builder.toString().trim();
 		ApplicationContext appContext = context.getApplicationContext();
 		SimpleScriptOrigin origin = new SimpleScriptOrigin("Interpreted-Script", source);
 		SimpleContainer container = new SimpleContainer();

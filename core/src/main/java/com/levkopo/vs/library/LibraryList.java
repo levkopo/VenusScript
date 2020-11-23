@@ -1,16 +1,13 @@
 package com.levkopo.vs.library;
 
-import com.github.bloodshura.ignitium.collection.list.impl.XArrayList;
-import com.github.bloodshura.ignitium.collection.view.XView;
-import com.github.bloodshura.ignitium.util.XApi;
-import com.levkopo.vs.component.object.ObjectDefinition;
 import com.levkopo.vs.function.Function;
 import com.levkopo.vs.type.Type;
 
-public class LibraryList extends XArrayList<VenusLibrary> {
-	public Function findFunction(String name, XView<Type> argumentTypes) {
-		XApi.requireNonNull(name, "name");
+import java.util.ArrayList;
+import java.util.List;
 
+public class LibraryList extends ArrayList<VenusLibrary> {
+	public Function findFunction(String name, List<Type> argumentTypes) {
 		Function found = null;
 		Function foundVarArgs = null;
 

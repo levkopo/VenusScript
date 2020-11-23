@@ -1,14 +1,15 @@
 package com.levkopo.vs.type;
 
-import com.github.bloodshura.ignitium.collection.view.XArrayView;
-import com.github.bloodshura.ignitium.collection.view.XView;
-import com.github.bloodshura.ignitium.enumeration.Enumerations;
-import com.github.bloodshura.ignitium.util.XApi;
 import com.levkopo.vs.expression.Variable;
 import com.levkopo.vs.function.Function;
-import com.github.bloodshura.ignitium.worker.UtilWorker;
+import com.levkopo.vs.operator.OperatorList;
 import com.levkopo.vs.value.*;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public final class PrimitiveType extends Type {
@@ -24,12 +25,12 @@ public final class PrimitiveType extends Type {
 	public static final Type MAP = new PrimitiveType("map", MapValue.class, Map.class);
 	public static final Type VARIABLE_REFERENCE = new PrimitiveType("var", VariableRefValue.class, Variable.class);
 
-	private final XView<Class<?>> objectTypes;
+	private final List<Class<?>> objectTypes;
 	private final Class<? extends Value> valueClass;
 
 	private PrimitiveType(String identifier, Class<? extends Value> valueClass, Class<?>... objectTypes) {
 		super(identifier);
-		this.objectTypes = new XArrayView<>(objectTypes);
+		this.objectTypes = Arrays.asList(objectTypes);
 		this.valueClass = valueClass;
 	}
 
@@ -45,12 +46,15 @@ public final class PrimitiveType extends Type {
 
 	@Override
 	public boolean objectAccepts(Class<?> type) {
-		return objectTypes.any(object -> object.isAssignableFrom(UtilWorker.fixPrimitiveClass(type)));
+		for(Class<?> object: objectTypes){
+			if(!object.isAssignableFrom(type))
+				return false;
+		}
+
+		return true;
 	}
 
 	public static Type forIdentifier(String identifier) {
-		XApi.requireNonNull(identifier, "identifier");
-
 		for (Type value : values()) {
 			if (value.getIdentifier().equals(identifier)) {
 				return value;
@@ -61,8 +65,6 @@ public final class PrimitiveType extends Type {
 	}
 
 	public static Type forObjectType(Class<?> type) {
-		XApi.requireNonNull(type, "type");
-
 		for (Type value : values()) {
 			if (value != ANY && value.objectAccepts(type)) {
 				return value;
@@ -73,8 +75,6 @@ public final class PrimitiveType extends Type {
 	}
 
 	public static Type forType(Class<? extends Value> type) {
-		XApi.requireNonNull(type, "type");
-
 		for (Type value : values()) {
 			if (value != ANY && value.accepts(type)) {
 				return value;
@@ -84,7 +84,15 @@ public final class PrimitiveType extends Type {
 		return ANY;
 	}
 
-	public static XView<PrimitiveType> values() {
-		return Enumerations.values(PrimitiveType.class);
+	public static List<PrimitiveType> values() {
+		List<PrimitiveType> output = new ArrayList<>();
+
+		for (Field f : PrimitiveType.class.getDeclaredFields())
+			if (Modifier.isStatic(f.getModifiers()))
+				try {
+					output.add((PrimitiveType) f.get(PrimitiveType.class));
+				} catch (IllegalAccessException ignored) {}
+
+		return output;
 	}
 }

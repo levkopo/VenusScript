@@ -1,37 +1,28 @@
 package com.levkopo.vs.executor;
 
-import com.github.bloodshura.ignitium.activity.logging.XLogger;
-import com.github.bloodshura.ignitium.collection.list.XListIterator;
-import com.github.bloodshura.ignitium.collection.store.impl.XQueue;
-import com.github.bloodshura.ignitium.threading.IgThread;
-import com.github.bloodshura.ignitium.threading.ThreadPool;
 import com.levkopo.vs.component.*;
+import com.levkopo.vs.component.branch.*;
 import com.levkopo.vs.exception.runtime.InvalidValueTypeException;
 import com.levkopo.vs.exception.runtime.ScriptRuntimeException;
 import com.levkopo.vs.expression.Expression;
 import com.levkopo.vs.function.Definition;
 import com.levkopo.vs.origin.ScriptMode;
 import com.levkopo.vs.type.PrimitiveType;
-import com.levkopo.vs.value.BoolValue;
-import com.levkopo.vs.value.DecimalValue;
-import com.levkopo.vs.value.IntegerValue;
-import com.levkopo.vs.value.IterableValue;
-import com.levkopo.vs.value.NumericValue;
-import com.levkopo.vs.value.Value;
-import com.levkopo.vs.component.branch.*;
+import com.levkopo.vs.value.*;
 
+import java.util.ArrayDeque;
+import java.util.Iterator;
+import java.util.Queue;
 import java.util.function.Supplier;
 
 public class VenusExecutor {
-	private final XQueue<ScriptRuntimeException> asyncExceptions;
-	private final ThreadPool asyncThreads;
+	private final Queue<ScriptRuntimeException> asyncExceptions;
 	private boolean breaking;
 	private boolean continuing;
 	private boolean shouldRun;
 
 	public VenusExecutor() {
-		this.asyncExceptions = new XQueue<>();
-		this.asyncThreads = new ThreadPool();
+		this.asyncExceptions = new ArrayDeque<>();
 		this.shouldRun = true;
 	}
 
@@ -45,7 +36,7 @@ public class VenusExecutor {
 
 	protected Value run(Container container, ScriptMode mode, Supplier<Boolean> shouldRun) throws ScriptRuntimeException {
 		Context context = container.getContext();
-		XListIterator<Component> iterator = container.getChildren().iterator();
+		Iterator<Component> iterator = container.getChildren().iterator();
 		Value result = null;
 		boolean hadIfAndNotProceed = false;
 
@@ -66,7 +57,7 @@ public class VenusExecutor {
 
 			if (component instanceof Container) {
 				if (component instanceof AsyncContainer) {
-					AsyncContainer asyncContainer = (AsyncContainer) component;
+					/*AsyncContainer asyncContainer = (AsyncContainer) component;
 					IgThread thread = new IgThread("AsyncVenusThread", () -> {
 						VenusExecutor executor = new VenusExecutor();
 
@@ -81,7 +72,7 @@ public class VenusExecutor {
 
 					asyncThreads.add(thread);
 					thread.setDaemon(asyncContainer.isDaemon());
-					thread.start();
+					thread.start();*/
 				} else if (component instanceof ForEachContainer) {
 					ForEachContainer forContainer = (ForEachContainer) component;
 					Expression expression = forContainer.getIterable();
@@ -272,7 +263,7 @@ public class VenusExecutor {
 						result = value;
 					} else if (mode == ScriptMode.INTERACTIVE) {
 						result = value;
-						XLogger.println(value);
+						System.out.println(value);
 					}
 				}
 			}

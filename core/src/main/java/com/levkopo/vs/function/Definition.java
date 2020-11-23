@@ -1,24 +1,23 @@
 package com.levkopo.vs.function;
 
-import com.github.bloodshura.ignitium.collection.list.XList;
-import com.github.bloodshura.ignitium.collection.view.XBasicView;
-import com.github.bloodshura.ignitium.collection.view.XView;
 import com.levkopo.vs.component.Container;
 import com.levkopo.vs.exception.runtime.ScriptRuntimeException;
 import com.levkopo.vs.executor.Context;
 import com.levkopo.vs.origin.ScriptMode;
 import com.levkopo.vs.type.Type;
 import com.levkopo.vs.value.Value;
+import com.sun.istack.internal.NotNull;
 
-import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class Definition extends Container implements Function {
-	private final XList<Argument> arguments;
+	private final List<Argument> arguments;
 	private final boolean global;
 	private final String name;
 	private final Type returnType;
 
-	public Definition(String name, XList<Argument> arguments, boolean global, Type returnType) {
+	public Definition(String name, List<Argument> arguments, boolean global, Type returnType) {
 		this.arguments = arguments;
 		this.global = global;
 		this.name = name;
@@ -46,19 +45,24 @@ public final class Definition extends Container implements Function {
 	}
 
 	@Override
-	public XView<Type> getArgumentTypes() {
-		return getArguments().map(Argument::getType);
+	public List<Type> getArgumentTypes() {
+		List<Type> types = new ArrayList<>();
+		for(Argument argument: arguments){
+			types.add(argument.getType());
+		}
+
+		return types;
 	}
 
-	public XView<Argument> getArguments() {
-		return new XBasicView<>(arguments);
+	public List<Argument> getArguments() {
+		return arguments;
 	}
 
 	public Type getReturnType() {
 		return returnType;
 	}
 
-	@Nonnull
+	@NotNull
 	@Override
 	public String getName() {
 		return name;

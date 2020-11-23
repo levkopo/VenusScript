@@ -1,6 +1,5 @@
 package com.levkopo.vs.expression;
 
-import com.github.bloodshura.ignitium.util.XApi;
 import com.levkopo.vs.exception.runtime.InvalidArrayAccessException;
 import com.levkopo.vs.exception.runtime.ScriptRuntimeException;
 import com.levkopo.vs.executor.Context;
@@ -15,9 +14,6 @@ public class ArrayGet implements Expression {
 	private final String name;
 
 	public ArrayGet(String name, Expression index) {
-		XApi.requireNonNull(index, "index");
-		XApi.requireNonNull(name, "name");
-
 		this.index = index;
 		this.name = name;
 	}

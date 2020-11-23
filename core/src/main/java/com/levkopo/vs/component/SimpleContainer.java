@@ -1,7 +1,5 @@
 package com.levkopo.vs.component;
 
-import com.github.bloodshura.ignitium.util.XApi;
-
 public class SimpleContainer extends Container {
 	private final String name;
 
@@ -10,8 +8,6 @@ public class SimpleContainer extends Container {
 	}
 
 	public SimpleContainer(String name) {
-		XApi.requireNonNull(name, "name");
-
 		this.name = name;
 	}
 

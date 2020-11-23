@@ -1,9 +1,5 @@
 package com.levkopo.vs.compiler;
 
-import com.github.bloodshura.ignitium.collection.list.XList;
-import com.github.bloodshura.ignitium.collection.list.impl.XArrayList;
-import com.github.bloodshura.ignitium.collection.store.impl.XStack;
-import com.levkopo.vs.exception.compile.ScriptCompileException;
 import com.levkopo.vs.exception.compile.UnexpectedTokenException;
 import com.levkopo.vs.expression.BinaryOperation;
 import com.levkopo.vs.expression.Expression;
@@ -14,21 +10,18 @@ import com.levkopo.vs.operator.Operator;
 import com.levkopo.vs.operator.OperatorList;
 import com.levkopo.vs.operator.UnaryOperator;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BuildingExpression {
-	private XList<String> inContext = new XArrayList<>();
+	private List<String> inContext = new ArrayList<>();
 	private final List<Object> values = new ArrayList<>();
 	private Operator operator;
 	private Expression expression;
-	private final XStack<UnaryOperator> unaryWhenAlready;
+	private final Stack<UnaryOperator> unaryWhenAlready;
 	private final static Map<Operator, Integer> binopPrecedence = new HashMap<>();
 
 	public BuildingExpression() {
-		this.unaryWhenAlready = new XStack<>();
+		this.unaryWhenAlready = new Stack<>();
 		binopPrecedence.put(OperatorList.PLUS, 1);
 		binopPrecedence.put(OperatorList.MINUS, 1);
 		binopPrecedence.put(OperatorList.MULTIPLY, 2);
@@ -95,10 +88,6 @@ public class BuildingExpression {
 
 	public Expression build() {
 		return expression;
-		/*if(values.size()==1)
-			return (Expression) values.get(0);
-
-		return parseBinOpRHS(0, (Expression) values.get(0), 1);*/
 	}
 
 	public Expression parseBinOpRHS(int exprPrec, Expression lhs, int num) {

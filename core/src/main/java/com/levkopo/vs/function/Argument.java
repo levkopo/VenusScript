@@ -1,11 +1,8 @@
 package com.levkopo.vs.function;
 
-import com.github.bloodshura.ignitium.object.Base;
 import com.levkopo.vs.type.Type;
 
-import javax.annotation.Nonnull;
-
-public class Argument extends Base {
+public class Argument {
 	private final String name;
 	private final Type type;
 
@@ -20,11 +17,5 @@ public class Argument extends Base {
 
 	public Type getType() {
 		return type;
-	}
-
-	@Nonnull
-	@Override
-	protected Object[] stringValues() {
-		return new Object[] { getName(), getType() };
 	}
 }

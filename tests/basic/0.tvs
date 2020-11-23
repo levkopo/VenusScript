@@ -1,0 +1,8 @@
+using std
+
+print("ok ")
+println("1")
+println("ok 2")
+--
+ok 1
+ok 2

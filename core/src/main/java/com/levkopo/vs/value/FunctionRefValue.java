@@ -1,6 +1,5 @@
 package com.levkopo.vs.value;
 
-import com.github.bloodshura.ignitium.util.XApi;
 import com.levkopo.vs.compiler.KeywordDefinitions;
 import com.levkopo.vs.type.PrimitiveType;
 
@@ -9,8 +8,6 @@ public class FunctionRefValue extends Value {
 
 	public FunctionRefValue(String value) {
 		super(PrimitiveType.FUNCTION_REFERENCE);
-		XApi.requireNonNull(value, "value");
-
 		this.value = value;
 	}
 

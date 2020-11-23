@@ -1,16 +1,17 @@
 package com.levkopo.vs.executor;
 
-import com.github.bloodshura.ignitium.collection.list.XList;
-import com.github.bloodshura.ignitium.collection.list.impl.XArrayList;
 import com.levkopo.vs.value.Value;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class VariableStructure {
-	private final XList<Object> changeMonitors;
+	private final List<Object> changeMonitors;
 	private final Object lockMonitor;
 	private Value value;
 
 	public VariableStructure(Value value) {
-		this.changeMonitors = new XArrayList<>();
+		this.changeMonitors = new ArrayList<>();
 		this.lockMonitor = new Object();
 		this.value = value;
 	}
