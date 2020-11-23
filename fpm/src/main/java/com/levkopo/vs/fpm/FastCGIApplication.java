@@ -22,12 +22,10 @@ import static java.lang.System.out;
 public class FastCGIApplication {
 
     public static void main(String[] args) {
-        int count = 0;
-
         VenusExecutor executor = new VenusExecutor();
         FCGIInterface fcgiinterface = new FCGIInterface();
+
         while(fcgiinterface.FCGIaccept()>=0) {
-            count++;
             ScriptOrigin origin = new FileScriptOrigin(new File(getProperty("SCRIPT_FILENAME")));
 
             StringBuilder output = new StringBuilder();

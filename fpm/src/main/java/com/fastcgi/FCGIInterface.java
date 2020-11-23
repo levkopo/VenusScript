@@ -18,10 +18,7 @@
 */
 package com.fastcgi;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.util.Properties;
 
@@ -39,6 +36,7 @@ public class FCGIInterface {
     private static boolean isFCGI = true;
     private static Properties startupProps;
     private static ServerSocket srvSocket;
+    public static final PrintStream originalStdout = System.out;
 
     /*
     * Accepts a new request from the HTTP server and creates
@@ -69,7 +67,12 @@ public class FCGIInterface {
     *
     */
     public int FCGIaccept() {
-        boolean acceptResult = accept();
+        boolean acceptResult = false;
+        try {
+            acceptResult = accept();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace(originalStdout);
+        }
         if (acceptResult) {
             return 0;
         }
@@ -78,7 +81,7 @@ public class FCGIInterface {
         }
     }
 
-    public boolean accept() {
+    public boolean accept() throws UnsupportedEncodingException {
         boolean acceptResult;
 
         /*
@@ -137,9 +140,9 @@ public class FCGIInterface {
             */
             System.setIn(new BufferedInputStream(request.getInputStream(), 8192));
             System.setOut(new PrintStream(new BufferedOutputStream(
-                    request.getOutputStream(), 8192)));
+                    request.getOutputStream(), 8192), true, "UTF-8"));
             System.setErr(new PrintStream(new BufferedOutputStream(
-                    request.getErrorStream(), 512)));
+                    request.getErrorStream(), 512), true, "UTF-8"));
             System.setProperties(request.getParameters());
         }
         return true;

@@ -164,9 +164,6 @@ public class FCGIInputStream extends InputStream {
      * Reads into an array of bytes. This method will block until some input is
      * available.
      *
-     * @param b   the buffer into which the data is read
-     * @param off the start offset of the data
-     * @param len the maximum number of bytes read
      * @return the actual number of bytes read, -1 is returned when the end of
      *         the stream is reached.
      * @throws IOException If an I/O error has occurred.

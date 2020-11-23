@@ -11,6 +11,7 @@ import com.levkopo.vs.origin.ScriptOrigin;
 import com.levkopo.vs.origin.SimpleScriptOrigin;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -19,6 +20,8 @@ public class InteractiveTester {
 	public static final boolean LIGHTWEIGHT_ERRORS = false;
 
 	public static void main(String[] args) throws Exception {
+		System.setOut(new PrintStream(System.out, true, "UTF-8"));
+
 		File[] dirs = new File("./tests").listFiles();
 		int i = 0;
 

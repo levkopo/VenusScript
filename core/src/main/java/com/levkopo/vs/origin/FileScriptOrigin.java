@@ -1,5 +1,7 @@
 package com.levkopo.vs.origin;
 
+import org.mozilla.universalchardet.UniversalDetector;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
@@ -33,7 +35,7 @@ public class FileScriptOrigin implements ScriptOrigin {
 
 	@Override
 	public String read() throws IOException {
-		Scanner reader = new Scanner(getFile());
+		Scanner reader = new Scanner(getFile(), UniversalDetector.detectCharset(getFile()));
 
 		StringBuilder value = new StringBuilder();
 		while (reader.hasNextLine()) {
