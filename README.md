@@ -1,8 +1,8 @@
 # VenusScript Mod
-[![CircleCI](https://circleci.com/gh/levkoposc/VenusScript.svg?style=svg)](https://circleci.com/gh/levkoposc/VenusScript)
+[![CircleCI](https://circleci.com/gh/levkopo/VenusScript.svg?style=svg)](https://circleci.com/gh/levkopo/VenusScript)
 
 Welcome to the official mod GitHub repository of the dynamic, injectable, scripting language **VenusScript**.
-See the [examples directory](https://github.com/levkoposc/VenusScript/tree/master/examples) to get a closer look in how the language works.
+See the [examples directory](https://github.com/levkopo/VenusScript/tree/master/examples) to get a closer look in how the language works.
 Based on [VenusScript](https://github.com/BloodShura/VenusScript)
 
 ## How to use
