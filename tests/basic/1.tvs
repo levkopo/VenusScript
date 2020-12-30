@@ -1,4 +1,3 @@
-using std
 
 def test(){
     print("ok ")

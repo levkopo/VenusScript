@@ -7,7 +7,7 @@ import com.levkopo.vs.function.FunctionCallDescriptor;
 import com.levkopo.vs.function.VoidMethod;
 import com.levkopo.vs.function.annotation.MethodArgs;
 import com.levkopo.vs.function.annotation.MethodName;
-import com.levkopo.vs.library.VenusLibrary;
+import com.levkopo.vs.library.VSLibrary;
 import com.levkopo.vs.value.StringValue;
 
 import java.util.function.Supplier;
@@ -19,8 +19,8 @@ public class DynamicUsing extends VoidMethod {
 	public void callVoid(Context context, FunctionCallDescriptor descriptor) throws ScriptRuntimeException {
 		StringValue libraryName = (StringValue) descriptor.get(0);
 		Script script = context.getScript();
-		Supplier<VenusLibrary> supplier = script.getApplicationContext().getLibrarySuppliers().get(libraryName.value());
-		VenusLibrary library;
+		Supplier<VSLibrary> supplier = script.getApplicationContext().getLibrarySuppliers().get(libraryName.value());
+		VSLibrary library;
 
 		if (supplier != null && (library = supplier.get()) != null) {
 			script.getLibraryList().add(library);

@@ -3,10 +3,12 @@ package com.levkopo.vs.expression;
 import com.levkopo.vs.exception.runtime.InvalidFunctionParameterException;
 import com.levkopo.vs.exception.runtime.ScriptRuntimeException;
 import com.levkopo.vs.executor.Context;
+import com.levkopo.vs.executor.OutputReference;
 import com.levkopo.vs.function.Function;
 import com.levkopo.vs.function.FunctionCallDescriptor;
 import com.levkopo.vs.type.PrimitiveType;
 import com.levkopo.vs.type.Type;
+import com.levkopo.vs.value.CallableValue;
 import com.levkopo.vs.value.DecimalValue;
 import com.levkopo.vs.value.IntegerValue;
 import com.levkopo.vs.value.Value;
@@ -43,11 +45,18 @@ public class FunctionCall implements Expression {
 		}
 
 		Function function = context.getOwner().findFunction(context, getFunctionName(), types);
+
 		List<Value> list = new ArrayList<>();
 		int i = 0;
 
+		if(function.deprecated()){
+			OutputReference reference = context.getApplicationContext().getUserData("err", OutputReference.class);
+			reference.output("Function "+function.getName()+" deprecated!");
+		}
+
 		// This check is necessary because of function references being untyped (issue #9).
-		if (!function.isVarArgs() && types.size() != function.getArgumentTypes().size()) {
+		if (!function.isVarArgs()
+				&& types.size() != function.getArgumentTypes().size()) {
 			throw new InvalidFunctionParameterException(context, "Function \"" + function + "\" expected " + function.getArgumentTypes().size() + " arguments; received " + types.size());
 		}
 
@@ -56,7 +65,7 @@ public class FunctionCall implements Expression {
 				Type required = function.getArgumentTypes().get(i);
 
 				if (value.getType() == PrimitiveType.INTEGER && required == PrimitiveType.DECIMAL) {
-					value = new DecimalValue(((IntegerValue) value).value());
+					value = new DecimalValue(((IntegerValue) value).value().doubleValue());
 				}
 
 				// This check is necessary because of function references being untyped (issue #9).

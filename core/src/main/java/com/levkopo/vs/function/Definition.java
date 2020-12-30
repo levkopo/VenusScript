@@ -1,25 +1,36 @@
 package com.levkopo.vs.function;
 
+import com.levkopo.vs.component.Annotation;
 import com.levkopo.vs.component.Container;
 import com.levkopo.vs.exception.runtime.ScriptRuntimeException;
 import com.levkopo.vs.executor.Context;
 import com.levkopo.vs.origin.ScriptMode;
 import com.levkopo.vs.type.Type;
 import com.levkopo.vs.value.Value;
-import com.sun.istack.internal.NotNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class Definition extends Container implements Function {
 	private final List<Argument> arguments;
 	private final boolean global;
 	private final String name;
 	private final Type returnType;
+	private final Map<String, Annotation> annotations = new HashMap<>();
 
 	public Definition(String name, List<Argument> arguments, boolean global, Type returnType) {
 		this.arguments = arguments;
 		this.global = global;
+		this.name = name;
+		this.returnType = returnType;
+	}
+
+	public Definition(String name, List<Argument> arguments, boolean global, Type returnType, Map<String, Annotation> annotations) {
+		this.arguments = arguments;
+		this.global = global;
+		this.annotations.putAll(annotations);
 		this.name = name;
 		this.returnType = returnType;
 	}
@@ -44,6 +55,15 @@ public final class Definition extends Container implements Function {
 		return arguments.size();
 	}
 
+	public Annotation getAnnotation(String name){
+		return annotations.get(name);
+	}
+
+	@Override
+	public boolean hasAnnotation(String name) {
+		return annotations.containsKey(name);
+	}
+
 	@Override
 	public List<Type> getArgumentTypes() {
 		List<Type> types = new ArrayList<>();
@@ -62,7 +82,6 @@ public final class Definition extends Container implements Function {
 		return returnType;
 	}
 
-	@NotNull
 	@Override
 	public String getName() {
 		return name;

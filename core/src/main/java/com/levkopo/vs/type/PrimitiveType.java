@@ -23,6 +23,7 @@ public final class PrimitiveType extends Type {
 	public static final Type VOID = new PrimitiveType("void", Value.class, void.class);
 	public static final Type TYPE = new PrimitiveType("type", TypeValue.class, Type.class);
 	public static final Type MAP = new PrimitiveType("map", MapValue.class, Map.class);
+	public static final Type CALLABLE = new PrimitiveType("callable", CallableValue.class, Object.class);
 	public static final Type VARIABLE_REFERENCE = new PrimitiveType("var", VariableRefValue.class, Variable.class);
 
 	private final List<Class<?>> objectTypes;

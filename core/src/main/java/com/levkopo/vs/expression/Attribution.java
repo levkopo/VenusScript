@@ -3,11 +3,6 @@ package com.levkopo.vs.expression;
 import com.levkopo.vs.exception.runtime.ScriptRuntimeException;
 import com.levkopo.vs.executor.Context;
 import com.levkopo.vs.value.Value;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
-
-import java.util.Map;
-
-import static com.sun.xml.internal.ws.org.objectweb.asm.Opcodes.ASTORE;
 
 public class Attribution implements Expression {
 	private final String name;
@@ -37,14 +32,5 @@ public class Attribution implements Expression {
 	@Override
 	public String toString() {
 		return "attribution(" + getName() + "=" + getExpression() + ')';
-	}
-
-	@Override
-	public MethodVisitor visit(MethodVisitor visitor, Map<String, Integer> variables) {
-		visitor = getExpression().visit(visitor, variables);
-		visitor.visitVarInsn(ASTORE, variables.size());
-		variables.put("A_"+getName(), variables.size());
-
-		return visitor;
 	}
 }

@@ -1,0 +1,27 @@
+
+@deprecated
+def deprecatedDef(){
+    println("This is not works")
+}
+
+def noDeprecatedDef(){
+    println("This is works")
+}
+
+@data("This is works!!!")
+def dataDef(){}
+
+if(!hasAnnotation(@deprecatedDef, "deprecated")){
+    deprecatedDef()
+}
+
+if(!hasAnnotation(@noDeprecatedDef, "deprecated")){
+    noDeprecatedDef()
+}
+
+data = getAnnotationData(@dataDef, "data")
+println(data[0])
+
+--
+This is works
+This is works!!!

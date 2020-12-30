@@ -6,9 +6,18 @@ import com.levkopo.vs.type.PrimitiveType;
 import com.levkopo.vs.type.Type;
 import com.levkopo.vs.value.Value;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface Function {
+
+	default boolean hasAnnotation(String name){
+		return false;
+	}
+
+	default boolean deprecated(){
+		return hasAnnotation("deprecated");
+	}
 
 	default boolean accepts(String name, List<Type> argumentTypes) {
 		if (getName().equals(name)) {

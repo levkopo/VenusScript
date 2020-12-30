@@ -1,10 +1,9 @@
 package com.levkopo.vs.value;
 
 import com.levkopo.vs.type.Type;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
 
 public abstract class Value implements Cloneable {
-	private final Type type;
+	public Type type;
 
 	public Value(Type type) {
 		this.type = type;
@@ -36,11 +35,6 @@ public abstract class Value implements Cloneable {
 
 	public final Type getType() {
 		return type;
-	}
-
-	public MethodVisitor visit(MethodVisitor visitor){
-		visitor.visitLdcInsn(value());
-		return visitor;
 	}
 
 	public Value higherEqualThan(Value value) {

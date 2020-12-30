@@ -1,0 +1,11 @@
+def test(str){
+    println(str)
+}
+
+def test2(ref test_){
+    test_("test")
+}
+
+test2(@test)
+--
+test

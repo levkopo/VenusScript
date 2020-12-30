@@ -1,0 +1,14 @@
+array = [5, 3, "abc", -2]
+println(array)
+array[0] = 333
+println(array)
+
+array = newArray(10, 0)
+println(array)
+println("Size: " + size(array))
+
+--
+[5, 3, abc, -2]
+[333, 5, 3, abc, -2]
+[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Size: 10

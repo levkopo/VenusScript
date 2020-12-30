@@ -6,7 +6,9 @@ public class ScriptRuntimeException extends Exception {
 	private final Context context;
 
 	public ScriptRuntimeException(Context context, CharSequence message) {
-		super(message + " at line " + context.getApplicationContext().currentLine() + " in \"" + context.getScript().getDisplayName() + "\"");
+		super(message + (context!=null?
+				" at line " + context.getApplicationContext().currentLine() + " in \"" + context.getScript().getDisplayName() + "\""
+				:" || ALTERNATIVE ERROR: CONTEXT IS NULL!"));
 		this.context = context;
 	}
 

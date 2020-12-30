@@ -1,0 +1,9 @@
+println("OK!")
+
+def threadDef(){
+    exit()
+}
+
+runOnThread(@threadDef)
+--
+OK!

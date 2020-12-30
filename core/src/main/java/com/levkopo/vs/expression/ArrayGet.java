@@ -10,11 +10,20 @@ import com.levkopo.vs.value.MapValue;
 import com.levkopo.vs.value.Value;
 
 public class ArrayGet implements Expression {
-	private final Expression index;
-	private final String name;
+	private Expression index;
+	private Expression name;
 
 	public ArrayGet(String name, Expression index) {
 		this.index = index;
+		this.name = new Variable(name);
+	}
+
+	public ArrayGet(Expression name, Expression index) {
+		this.index = index;
+		this.name = name;
+	}
+
+	public void setName(Expression name) {
 		this.name = name;
 	}
 
@@ -22,13 +31,13 @@ public class ArrayGet implements Expression {
 		return index;
 	}
 
-	public String getName() {
+	public Expression getName() {
 		return name;
 	}
 
 	@Override
 	public Value resolve(Context context, Context vars_context) throws ScriptRuntimeException {
-		Value value = vars_context.getVarValue(getName());
+		Value value = name.resolve(context, vars_context);
 		Value index = getIndex().resolve(context, vars_context);
 
 		if (value instanceof ArrayValue) {
@@ -43,10 +52,10 @@ public class ArrayGet implements Expression {
 			throw new InvalidArrayAccessException(context, "Index \"" + index + "\" is of type " + index.getType() + "; expected to be an " + PrimitiveType.INTEGER);
 		}else if(value instanceof MapValue) {
 			MapValue map = (MapValue) value;
-			return map.get(vars_context, index);
+			return map.get(index);
 		}
 
-		throw new InvalidArrayAccessException(context, "Variable \"" + getName() + "\" is of type " + value.getType() + "; expected to be an " + PrimitiveType.ARRAY);
+		throw new InvalidArrayAccessException(context, "Variable \"" + getName() + "\" is of type " + value.getType() + "; expected to be an " + PrimitiveType.ARRAY + " or "+PrimitiveType.MAP);
 	}
 
 	@Override

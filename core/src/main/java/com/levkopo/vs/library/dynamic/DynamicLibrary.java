@@ -1,9 +1,9 @@
 package com.levkopo.vs.library.dynamic;
 
-import com.levkopo.vs.library.VenusLibrary;
+import com.levkopo.vs.library.VSLibrary;
 
-public class DynamicLibrary extends VenusLibrary {
+public class DynamicLibrary extends VSLibrary {
 	public DynamicLibrary() {
-		addAll(DynamicInclude.class, DynamicUsing.class);
+		addAllFunctions(DynamicInclude.class, DynamicUsing.class);
 	}
 }

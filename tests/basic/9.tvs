@@ -1,0 +1,20 @@
+#Empty map bug test
+empty = {}
+map = {
+    "string":"OK",
+    "map":{
+        "1":1,
+        "2":2,
+        "ok":"OK 3"
+    }
+}
+
+map_ = map["map"]
+println(map['string']+" "+map_['1'])
+println(map.string+" "+map_["2"])
+println(map.map.ok)
+
+--
+OK 1
+OK 2
+OK 3

@@ -7,7 +7,7 @@ import com.levkopo.vs.function.Function;
 import com.levkopo.vs.function.FunctionCallDescriptor;
 import com.levkopo.vs.function.VoidMethod;
 import com.levkopo.vs.function.annotation.MethodName;
-import com.levkopo.vs.library.VenusLibrary;
+import com.levkopo.vs.library.VSLibrary;
 
 import java.util.Map;
 import java.util.Objects;
@@ -18,7 +18,7 @@ public class VSInfo extends VoidMethod {
 
     @Override
     public void callVoid(Context context, FunctionCallDescriptor descriptor) throws UndefinedVariableException {
-        Map<String, Supplier<VenusLibrary>> libs = context.getApplicationContext().getLibrarySuppliers();
+        Map<String, Supplier<VSLibrary>> libs = context.getApplicationContext().getLibrarySuppliers();
         OutputReference reference = context.getApplicationContext().getUserData("out", OutputReference.class);
 
         reference.output("<table border=\"1\">\n" +
@@ -28,11 +28,11 @@ public class VSInfo extends VoidMethod {
                 "    <th>Functions</th>\n" +
                 "   </tr>");
         for(String libName : libs.keySet()){
-            VenusLibrary lib = Objects.requireNonNull(libs.get(libName)).get();
+            VSLibrary lib = Objects.requireNonNull(libs.get(libName)).get();
             reference.output("<tr>");
             reference.output("<td>"+libName+"</td>");
             reference.output("<td>");
-            for (Function function:lib){
+            for (Function function:lib.functions){
                 reference.output(function.getName()+";");
             }
             reference.output("</td>");

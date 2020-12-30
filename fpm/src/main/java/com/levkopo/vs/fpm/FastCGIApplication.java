@@ -9,12 +9,15 @@ import com.levkopo.vs.fpm.lib.FPMLibrary;
 import com.levkopo.vs.origin.FileScriptOrigin;
 import com.levkopo.vs.origin.ScriptMode;
 import com.levkopo.vs.origin.ScriptOrigin;
+import com.levkopo.vs.value.NullValue;
+import com.levkopo.vs.value.StringValue;
 
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 import static java.lang.System.getProperty;
 import static java.lang.System.out;
@@ -22,7 +25,6 @@ import static java.lang.System.out;
 public class FastCGIApplication {
 
     public static void main(String[] args) {
-        VenusExecutor executor = new VenusExecutor();
         FCGIInterface fcgiinterface = new FCGIInterface();
 
         while(fcgiinterface.FCGIaccept()>=0) {
@@ -32,6 +34,19 @@ public class FastCGIApplication {
             Map<String, String> headers = new HashMap<>();
             try {
                 ApplicationContext ctx = new ApplicationContext();
+
+                if(getProperty("REQUEST_METHOD").equals("POST")){
+                    Scanner scanner = new Scanner(System.in, "UTF-8");
+                    scanner.useDelimiter("[\\r\\n;]+");
+
+                    StringBuilder postData = new StringBuilder();
+                    while(scanner.hasNextLine())
+                        postData.append(scanner.nextLine());
+
+                    scanner.close();
+                    ctx.setVar("post", new StringValue(postData.toString().trim()));
+                }else ctx.setVar("post", new NullValue());
+
                 ctx.getLibrarySuppliers().put("fpm", FPMLibrary::new);
                 ctx.setUserData("in", null);
                 ctx.setUserData("out", (OutputReference) output::append);
@@ -42,6 +57,10 @@ public class FastCGIApplication {
                 });
 
                 Script script = origin.compile(ctx);
+                VenusExecutor executor = new VenusExecutor(throwable -> output.append("<b>Error</b>: ")
+                        .append(throwable.getClass().getSimpleName())
+                        .append(": ").append(throwable.getMessage())
+                );
                 executor.run(script, ScriptMode.NORMAL);
             } catch (Exception e) {
                 StringWriter errors = new StringWriter();

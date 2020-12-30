@@ -3,8 +3,6 @@ package com.levkopo.vs.executor;
 import com.levkopo.vs.component.Container;
 import com.levkopo.vs.component.Script;
 import com.levkopo.vs.exception.runtime.UndefinedVariableException;
-import com.levkopo.vs.expression.Variable;
-import com.levkopo.vs.value.NullValue;
 import com.levkopo.vs.value.Value;
 
 import java.util.HashMap;
@@ -22,7 +20,6 @@ public class Context implements Cloneable {
 		this.owner = owner;
 		this.parent = parent;
 		this.variables = new HashMap<>();
-		this.variables.put("null", new VariableStructure(new NullValue()));
 	}
 
 	@Override
@@ -75,22 +72,14 @@ public class Context implements Cloneable {
 			try {
 				if(getOwner().getContext().hasVar(name))
 					return getOwner().getContext().getVar(name);
-			} catch (UndefinedVariableException ignored) { }
+			} catch (UndefinedVariableException ignored) {}
 		}
 
 		throw new UndefinedVariableException(this, name);
 	}
 
-	public VariableStructure getVar(Variable variable) throws UndefinedVariableException {
-		return getVar(variable.getName());
-	}
-
 	public Value getVarValue(String name) throws UndefinedVariableException {
 		return getVar(name).getValue();
-	}
-
-	public Value getVarValue(Variable variable) throws UndefinedVariableException {
-		return getVarValue(variable.getName());
 	}
 
 	public Map<String, VariableStructure> getVariables() {
@@ -117,6 +106,7 @@ public class Context implements Cloneable {
 		if (!changeVar(name, value)) {
 			getVariables().put(name, new VariableStructure(value));
 		}
+
 	}
 
 	@Override

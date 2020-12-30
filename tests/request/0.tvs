@@ -1,0 +1,6 @@
+using request
+r = new request(url:"https://api.vk.com/method/users.get")
+
+println(r.execute())
+--
+{"error":{"error_code":5,"error_msg":"User authorization failed: no access_token passed.","request_params":[{"key":"method","value":"users.get"},{"key":"oauth","value":"1"}]}}

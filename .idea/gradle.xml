@@ -11,6 +11,8 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/core" />
             <option value="$PROJECT_DIR$/fpm" />
+            <option value="$PROJECT_DIR$/vs-cli" />
+            <option value="$PROJECT_DIR$/vsc" />
           </set>
         </option>
       </GradleProjectSettings>

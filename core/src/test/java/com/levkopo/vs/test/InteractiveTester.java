@@ -19,7 +19,7 @@ public class InteractiveTester {
 	//public static final Directory DIRECTORY = new Directory("./examples");
 	public static final boolean LIGHTWEIGHT_ERRORS = false;
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Throwable {
 		System.setOut(new PrintStream(System.out, true, "UTF-8"));
 
 		File[] dirs = new File("./tests").listFiles();
@@ -64,7 +64,13 @@ public class InteractiveTester {
 				script = origin.compile(ctx);
 			}
 
-			VenusExecutor executor = new VenusExecutor();
+			VenusExecutor executor = new VenusExecutor(throwable -> {
+				System.err.println(
+						throwable.getClass().getSimpleName() + ": " + throwable.getMessage()
+				);
+				throwable.printStackTrace();
+				System.exit(-1);
+			});
 			long start = System.currentTimeMillis();
 
 			try {
@@ -87,5 +93,8 @@ public class InteractiveTester {
 		}
 
 		System.out.println("Result: "+completed+"/"+Objects.requireNonNull(dirs[option].listFiles()).length);
+
+		if(completed<Objects.requireNonNull(dirs[option].listFiles()).length)
+			System.exit(-1);
 	}
 }

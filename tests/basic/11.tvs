@@ -1,0 +1,11 @@
+
+try{
+    println("123")
+    println(abc)
+}catch(e){
+    println("456")
+}
+
+--
+123
+456

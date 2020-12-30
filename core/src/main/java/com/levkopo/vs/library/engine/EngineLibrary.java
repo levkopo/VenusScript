@@ -1,9 +1,9 @@
 package com.levkopo.vs.library.engine;
 
-import com.levkopo.vs.library.VenusLibrary;
+import com.levkopo.vs.library.VSLibrary;
 
-public class EngineLibrary extends VenusLibrary {
+public class EngineLibrary extends VSLibrary {
 	public EngineLibrary() {
-		addAll(Evaluate.class, HasFunction.class, Interpret.class, Run.class);
+		addAllFunctions(Evaluate.class, HasFunction.class, Interpret.class, Run.class);
 	}
 }

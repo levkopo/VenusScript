@@ -1,10 +1,12 @@
 package com.levkopo.vs.library.request;
 
-import com.levkopo.vs.library.VenusLibrary;
+import com.levkopo.vs.library.VSLibrary;
 
-public class RequestLibrary extends VenusLibrary {
+public class RequestLibrary extends VSLibrary {
 
     public RequestLibrary(){
-        addAll(GETRequest.class);
+        addObject(RequestObject.class);
+        addFunction(GETRequest.class);
+        addFunction(BuildHTTPParameters.class);
     }
 }

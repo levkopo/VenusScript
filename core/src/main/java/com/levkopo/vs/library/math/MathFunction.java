@@ -8,7 +8,6 @@ import com.levkopo.vs.type.PrimitiveType;
 import com.levkopo.vs.type.Type;
 import com.levkopo.vs.value.IntegerValue;
 import com.levkopo.vs.value.Value;
-import com.sun.istack.internal.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -73,7 +72,6 @@ public class MathFunction implements Function {
 		return method;
 	}
 
-	@NotNull
 	@Override
 	public String getName() {
 		return name;

@@ -12,20 +12,20 @@ import com.levkopo.vs.value.FunctionRefValue;
 import com.levkopo.vs.value.Value;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class Container extends Component {
 	protected Context context;
-	private final List<Component> children;
 
-	public Container() {
-		this.children = new ArrayList<>();
-	}
+	private final List<Component> children = new ArrayList<>();
+	private final List<Function> functions = new ArrayList<>();
+	private final Map<String, ObjectDefinition> objectDefinitions = new HashMap<>();
 
 	public Function findFunction(Context context, String name, List<Type> argumentTypes) throws ScriptRuntimeException {
 		if (context.hasVar(name)) {
-			Value value = context.getVarValue(name); // Should not need to catch UndefinedVariableException since we already
-			// checked that the variable exists
+			Value value = context.getVarValue(name);
 			if (value instanceof FunctionRefValue) {
 				FunctionRefValue reference = (FunctionRefValue) value;
 
@@ -33,40 +33,10 @@ public abstract class Container extends Component {
 			}
 		}
 
-		Definition foundVarArgs = null;
-
-		for(Component component: getChildren()){
-			if(component instanceof Definition){
-				Definition definition = (Definition) component;
+		for(Function function: functions){
+			if(function instanceof Definition){
+				Definition definition = (Definition) function;
 				if (definition.accepts(name, argumentTypes)) {
-					if (definition.isVarArgs()) {
-						foundVarArgs = definition;
-					} else {
-						return definition;
-					}
-				}
-			}
-		}
-
-		if (foundVarArgs != null) {
-			return foundVarArgs;
-		}
-
-		if (hasParent()) {
-			try {
-				return getParent().findFunction(context, name, argumentTypes);
-			} catch (UndefinedFunctionException ignored) {
-			}
-		}
-
-		throw new UndefinedFunctionException(context, name, argumentTypes);
-	}
-
-	public ObjectDefinition findObjectDefinition(Context context, String name) throws ScriptRuntimeException {
-		for(Component component: getChildren()){
-			if(component instanceof ObjectDefinition){
-				ObjectDefinition definition = (ObjectDefinition) component;
-				if (definition.getName().equals(name)) {
 					return definition;
 				}
 			}
@@ -74,34 +44,43 @@ public abstract class Container extends Component {
 
 		if (hasParent()) {
 			try {
-				return getParent().findObjectDefinition(context, name);
-			} catch (UndefinedValueTypeException ignored) {
-			}
+				return getParent().findFunction(context, name, argumentTypes);
+			} catch (UndefinedFunctionException ignored) {}
 		}
 
-		//context.getApplicationContext()
+		throw new UndefinedFunctionException(context, name, argumentTypes);
+	}
+
+	public ObjectDefinition findObjectDefinition(Context context, String name) throws ScriptRuntimeException {
+		if(objectDefinitions.containsKey(name)){
+			return objectDefinitions.get(name);
+		}
+
+		if (hasParent()) {
+			try {
+				return getParent().findObjectDefinition(context, name);
+			} catch (UndefinedValueTypeException ignored) {}
+		}
 
 		throw new UndefinedValueTypeException(context, name);
 	}
 
 	public Type findType(Context context, String name) throws ScriptRuntimeException {
-		for(Component component: getChildren()){
-			if(component instanceof ObjectDefinition){
-				ObjectDefinition definition = (ObjectDefinition) component;
-				if (definition.getName().equals(name)) {
-					return definition.getType();
-				}
-			}
+		if(objectDefinitions.containsKey(name)){
+			return objectDefinitions.get(name).getType();
 		}
 
 		if (hasParent()) {
 			try {
 				return getParent().findType(context, name);
-			} catch (UndefinedValueTypeException ignored) {
-			}
+			} catch (UndefinedValueTypeException ignored) {}
 		}
 
 		throw new UndefinedValueTypeException(context, name);
+	}
+
+	public List<Function> getFunctions() {
+		return functions;
 	}
 
 	public List<Component> getChildren() {
@@ -110,7 +89,13 @@ public abstract class Container extends Component {
 
 	public void addChildren(Component component) {
 		component.setParent(this);
-		children.add(component);
+
+		if(component instanceof Function)
+			functions.add((Function) component);
+		else if(component instanceof ObjectDefinition){
+			ObjectDefinition definition = (ObjectDefinition) component;
+			objectDefinitions.put(definition.getName(), definition);
+		}else children.add(component);
 	}
 
 	public Context getContext() {

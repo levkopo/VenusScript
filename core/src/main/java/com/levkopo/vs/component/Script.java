@@ -1,12 +1,14 @@
 package com.levkopo.vs.component;
 
 import com.levkopo.vs.compiler.VenusParser;
+import com.levkopo.vs.component.object.ObjectDefinition;
 import com.levkopo.vs.exception.compile.ScriptCompileException;
 import com.levkopo.vs.exception.runtime.ScriptRuntimeException;
 import com.levkopo.vs.executor.ApplicationContext;
 import com.levkopo.vs.executor.Context;
 import com.levkopo.vs.function.Function;
 import com.levkopo.vs.library.LibraryList;
+import com.levkopo.vs.library.lang.LangLibrary;
 import com.levkopo.vs.origin.ScriptOrigin;
 import com.levkopo.vs.type.Type;
 
@@ -27,6 +29,8 @@ public class Script extends Container {
 		this.libraryList = new LibraryList();
 		this.origin = origin;
 		this.parser = new VenusParser(this);
+
+		this.libraryList.add(new LangLibrary());
 	}
 
 	@Override
@@ -37,14 +41,33 @@ public class Script extends Container {
 			for (Script script : getIncludes()) {
 				try {
 					return script.findFunction(context, name, argumentTypes);
-				} catch (ScriptRuntimeException ignored) {
-				}
+				} catch (ScriptRuntimeException ignored) {}
 			}
 
 			Function function = getLibraryList().findFunction(name, argumentTypes);
 
 			if (function != null) {
 				return function;
+			}
+
+			throw exception;
+		}
+	}
+
+	@Override
+	public ObjectDefinition findObjectDefinition(Context context, String name) throws ScriptRuntimeException {
+		try {
+			return super.findObjectDefinition(context, name);
+		}catch (ScriptRuntimeException exception) {
+			for (Script script : getIncludes()) {
+				try {
+					return script.findObjectDefinition(context, name);
+				} catch (ScriptRuntimeException ignored) { }
+			}
+
+			ObjectDefinition object = getLibraryList().findObject(name);
+			if (object != null) {
+				return object;
 			}
 
 			throw exception;

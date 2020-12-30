@@ -6,6 +6,7 @@ import com.levkopo.vs.executor.Context;
 import com.levkopo.vs.type.PrimitiveType;
 import com.levkopo.vs.value.ArrayValue;
 import com.levkopo.vs.value.IntegerValue;
+import com.levkopo.vs.value.MapValue;
 import com.levkopo.vs.value.Value;
 
 public class ArraySet implements Expression {
@@ -43,12 +44,19 @@ public class ArraySet implements Expression {
 				IntegerValue intIndex = (IntegerValue) index;
 				Value result = getExpression().resolve(context, vars_context);
 
-				array.set(vars_context, intIndex.value().intValue(), result);
+				array.set(intIndex.value().intValue(), result);
 
 				return result;
 			}
 
 			throw new InvalidArrayAccessException(context, "Index \"" + index + "\" is of type " + index.getType() + "; expected to be an " + PrimitiveType.INTEGER);
+		}else if(value instanceof MapValue){
+			MapValue map = (MapValue) value;
+			Value index = getIndex().resolve(context, vars_context);
+			Value result = getExpression().resolve(context, vars_context);
+
+			map.getMap().put(index.value(), result);
+			return result;
 		}
 
 		throw new InvalidArrayAccessException(context, "Variable \"" + getName() + "\" is of type " + value.getType() + "; expected to be an " + PrimitiveType.ARRAY);

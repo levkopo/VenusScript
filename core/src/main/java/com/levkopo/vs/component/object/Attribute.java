@@ -1,7 +1,6 @@
 package com.levkopo.vs.component.object;
 
 import com.levkopo.vs.expression.Expression;
-import com.sun.istack.internal.NotNull;
 
 public class Attribute {
 	private final Expression defaultExpression;
@@ -24,7 +23,6 @@ public class Attribute {
 		return getDefaultExpression() != null;
 	}
 
-	@NotNull
 	protected Object[] stringValues() {
 		return new Object[] { getName(), getDefaultExpression() };
 	}

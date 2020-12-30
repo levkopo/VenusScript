@@ -1,17 +1,18 @@
 package com.levkopo.vs.library.math;
 
-import com.levkopo.vs.library.VenusLibrary;
+import com.levkopo.vs.library.VSLibrary;
 
 import java.lang.reflect.Method;
 
-public class MathLibrary extends VenusLibrary {
+public class MathLibrary extends VSLibrary {
 	public MathLibrary() {
 		for (Method method : Math.class.getDeclaredMethods()) {
 			if (MathFunction.validate(method)) {
-				add(new MathFunction(method));
+				addFunction(new MathFunction(method));
 			}
 		}
 
-		addAll(RandDecimal.class, RandInt.class);
+		addFunction(RandDecimal.class);
+		addFunction(RandInt.class);
 	}
 }

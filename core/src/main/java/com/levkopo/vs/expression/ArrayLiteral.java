@@ -21,11 +21,11 @@ public class ArrayLiteral implements Expression {
 
 	@Override
 	public Value resolve(Context context, Context vars_context) throws ScriptRuntimeException {
-		ArrayValue value = new ArrayValue(getExpressions().size());
+		ArrayValue value = new ArrayValue();
 		int i = 0;
 
 		for (Expression expression : getExpressions()) {
-			value.set(vars_context, i++, expression.resolve(context, vars_context));
+			value.set(i++, expression.resolve(context, vars_context));
 		}
 
 		return value;

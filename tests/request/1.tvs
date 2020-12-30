@@ -1,0 +1,21 @@
+using request, json
+
+export DRUToken = "bJv15UuVe6Y22Xq7ndZAVEVAo0Y5W5gb"
+
+def getLessonsToday(){
+    startDate = 1606608000
+    finishDate = 1606694400
+
+    req = new request(method: "POST", url:"https://api.dnevnik.ru/mobile/v5/persons/1000004013603/schools/1000003917301/groups/1686036957389031155/diary")
+    req.setParameters({
+        "startDate": (startDate),
+        "finishDate": (finishDate)
+    })
+    req.addHeader("Access-Token", $DRUToken)
+
+    println(req.execute())
+}
+
+getLessonsToday()
+
+--

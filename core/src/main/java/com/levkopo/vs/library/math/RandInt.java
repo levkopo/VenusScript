@@ -9,17 +9,13 @@ import com.levkopo.vs.function.annotation.MethodName;
 import com.levkopo.vs.value.IntegerValue;
 import com.levkopo.vs.value.Value;
 
-import java.util.Random;
-
-@MethodArgs({ IntegerValue.class, IntegerValue.class })
+@MethodArgs({ Value.class, Value.class })
 @MethodName("randInt")
 public class RandInt extends Method {
 	@Override
 	public Value call(Context context, FunctionCallDescriptor descriptor) throws ScriptRuntimeException {
-		IntegerValue min = (IntegerValue) descriptor.get(0);
-		IntegerValue max = (IntegerValue) descriptor.get(1);
-		long minValue = min.value();
-		long maxValue = max.value();
+		long minValue = ((Number) descriptor.get(0).value()).longValue();
+		long maxValue = ((Number) descriptor.get(1).value()).longValue();
 
 		if (minValue > maxValue) {
 			long temp = maxValue;

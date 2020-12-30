@@ -4,27 +4,24 @@ import com.levkopo.vs.exception.runtime.InvalidArrayAccessException;
 import com.levkopo.vs.exception.runtime.ScriptRuntimeException;
 import com.levkopo.vs.executor.Context;
 import com.levkopo.vs.type.PrimitiveType;
-import com.sun.istack.internal.NotNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 public class ArrayValue extends IterableValue {
-	private final Value[] values;
-
-	public ArrayValue(int size) {
-		this(new Value[size]);
-	}
+	private final List<Value> values = new ArrayList<>();
 
 	public ArrayValue(Value... values) {
 		super(PrimitiveType.ARRAY);
 
-		this.values = values;
+		this.values.addAll(Arrays.asList(values));
 	}
 
 	@Override
 	public ArrayValue clone() {
-		return new ArrayValue(Arrays.copyOf(values, values.length));
+		return new ArrayValue(values.toArray(new Value[0]));
 	}
 
 	@Override
@@ -32,7 +29,7 @@ public class ArrayValue extends IterableValue {
 		if (value instanceof ArrayValue) {
 			ArrayValue array = (ArrayValue) value;
 
-			return new BoolValue(size() == array.size() && Arrays.equals(value(), array.value()));
+			return new BoolValue(size() == array.size() && value().equals(array.value()));
 		}
 
 		return new BoolValue(false);
@@ -43,24 +40,20 @@ public class ArrayValue extends IterableValue {
 			throw new InvalidArrayAccessException(context, "Out of range array index: " + index + ", expected between 0~" + (size() - 1));
 		}
 
-		return value()[index];
+		return value().get(index);
 	}
 
 	@Override
 	public Iterator<Value> iterator() {
-		return Arrays.stream(values).iterator();
+		return values.iterator();
 	}
 
-	public void set(Context context, int index, Value value) throws ScriptRuntimeException {
-		if (index < 0 || index >= size()) {
-			throw new InvalidArrayAccessException(context, "Out of range array index: " + index + ", expected between 0~" + (size() - 1));
-		}
-
-		value()[index] = value;
+	public void set(int index, Value value) {
+		value().add(index, value);
 	}
 
 	public int size() {
-		return value().length;
+		return value().size();
 	}
 
 	@Override
@@ -69,11 +62,11 @@ public class ArrayValue extends IterableValue {
 	}
 
 	@Override
-	public Value[] value() {
+	public List<Value> value() {
 		return values;
 	}
 
 	private static String toString(ArrayValue array) {
-		return Arrays.toString(array.value());
+		return array.value().toString();
 	}
 }

@@ -3,8 +3,6 @@
 # Basically, shows the value type of some variables,
 # and asserts they are correct.
 
-using std
-
 a = "I <3 COMPUTER SCIENCE!"
 b = 5.3547
 c = -33
@@ -36,7 +34,7 @@ println((*i) == (*any))
 --
 string
 decimal
-decimal
+int
 string
 bool
 bool
@@ -45,7 +43,7 @@ type
 any
 true
 true
-false
+true
 true
 true
 true

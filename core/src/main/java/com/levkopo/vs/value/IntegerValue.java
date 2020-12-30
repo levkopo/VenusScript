@@ -1,7 +1,6 @@
 package com.levkopo.vs.value;
 
 import com.levkopo.vs.type.PrimitiveType;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
 
 public class IntegerValue extends NumericValue {
 	private final long value;
@@ -14,7 +13,7 @@ public class IntegerValue extends NumericValue {
 	@Override
 	public Value and(Value value) {
 		if (value instanceof IntegerValue) {
-			return new IntegerValue(value() & ((IntegerValue) value).value());
+			return new IntegerValue(this.value & ((IntegerValue) value).value().longValue());
 		}
 
 		return super.and(value);
@@ -22,7 +21,7 @@ public class IntegerValue extends NumericValue {
 
 	@Override
 	public IntegerValue clone() {
-		return new IntegerValue(value());
+		return new IntegerValue(value);
 	}
 
 	@Override
@@ -30,19 +29,10 @@ public class IntegerValue extends NumericValue {
 		if (value instanceof NumericValue) {
 			NumericValue numeric = (NumericValue) value;
 
-			return value().compareTo(numeric.value().longValue());
+			return Long.compare(this.value, numeric.value().longValue());
 		}
 
 		return super.compareTo(value);
-	}
-
-	@Override
-	public MethodVisitor visit(MethodVisitor visitor) {
-		if(value<=Integer.MAX_VALUE)
-			visitor.visitLdcInsn((int) value);
-		else visitor.visitLdcInsn(value);
-
-		return visitor;
 	}
 
 	@Override
@@ -50,7 +40,7 @@ public class IntegerValue extends NumericValue {
 		if (value instanceof NumericValue) {
 			NumericValue numeric = (NumericValue) value;
 
-			return new IntegerValue(value() / numeric.value().longValue());
+			return new IntegerValue(this.value / numeric.value().longValue());
 		}
 
 		return super.divide(value);
@@ -61,7 +51,7 @@ public class IntegerValue extends NumericValue {
 		if (value instanceof NumericValue) {
 			NumericValue numeric = (NumericValue) value;
 
-			return new IntegerValue(value() - numeric.value().longValue());
+			return new IntegerValue(this.value - numeric.value().longValue());
 		}
 
 		return super.minus(value);
@@ -72,7 +62,7 @@ public class IntegerValue extends NumericValue {
 		if (value instanceof NumericValue) {
 			NumericValue numeric = (NumericValue) value;
 
-			return new IntegerValue(value() * numeric.value().longValue());
+			return new IntegerValue(this.value * numeric.value().longValue());
 		}
 
 		return super.multiply(value);
@@ -80,13 +70,13 @@ public class IntegerValue extends NumericValue {
 
 	@Override
 	public Value negate() {
-		return new IntegerValue(-value());
+		return new IntegerValue(-value);
 	}
 
 	@Override
 	public Value or(Value value) {
 		if (value instanceof IntegerValue) {
-			return new IntegerValue(value() | ((IntegerValue) value).value());
+			return new IntegerValue(this.value | (long) ((IntegerValue) value).value());
 		}
 
 		return super.or(value);
@@ -97,7 +87,7 @@ public class IntegerValue extends NumericValue {
 		if (value instanceof NumericValue) {
 			NumericValue numeric = (NumericValue) value;
 
-			return new IntegerValue(value() + numeric.value().longValue());
+			return new IntegerValue(this.value + numeric.value().longValue());
 		}
 
 		return super.plus(value);
@@ -108,7 +98,7 @@ public class IntegerValue extends NumericValue {
 		if (value instanceof NumericValue) {
 			NumericValue numeric = (NumericValue) value;
 
-			return new IntegerValue(value() % numeric.value().longValue());
+			return new IntegerValue(this.value % numeric.value().longValue());
 		}
 
 		return super.remainder(value);
@@ -119,7 +109,7 @@ public class IntegerValue extends NumericValue {
 		if (value instanceof IntegerValue) {
 			IntegerValue integer = (IntegerValue) value;
 
-			return new IntegerValue(value() << integer.value());
+			return new IntegerValue(this.value << (long) integer.value());
 		}
 
 		return super.shiftLeft(value);
@@ -130,7 +120,7 @@ public class IntegerValue extends NumericValue {
 		if (value instanceof IntegerValue) {
 			IntegerValue integer = (IntegerValue) value;
 
-			return new IntegerValue(value() >> integer.value());
+			return new IntegerValue(this.value >> (long) integer.value());
 		}
 
 		return super.shiftRight(value);
@@ -138,11 +128,13 @@ public class IntegerValue extends NumericValue {
 
 	@Override
 	public String toString() {
-		return Long.toString(value());
+		return Long.toString(value);
 	}
 
 	@Override
-	public Long value() {
-		return value;
+	public Number value() {
+		if(value<=Integer.MAX_VALUE)
+			return (int) value;
+		else return value;
 	}
 }

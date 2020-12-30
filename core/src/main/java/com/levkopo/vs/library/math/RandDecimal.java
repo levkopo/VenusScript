@@ -16,10 +16,8 @@ import java.util.Random;
 public class RandDecimal extends Method {
 	@Override
 	public Value call(Context context, FunctionCallDescriptor descriptor) throws ScriptRuntimeException {
-		DecimalValue min = (DecimalValue) descriptor.get(0);
-		DecimalValue max = (DecimalValue) descriptor.get(1);
-		double minValue = min.value();
-		double maxValue = max.value();
+		double minValue = ((Number) descriptor.get(0).value()).doubleValue();
+		double maxValue = ((Number) descriptor.get(1).value()).doubleValue();
 
 		if (minValue > maxValue) {
 			double temp = maxValue;

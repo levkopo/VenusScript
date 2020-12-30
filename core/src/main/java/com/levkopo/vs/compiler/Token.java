@@ -1,7 +1,5 @@
 package com.levkopo.vs.compiler;
 
-import com.sun.istack.internal.NotNull;
-
 public class Token {
 	private final Type type;
 	private final String value;
@@ -23,7 +21,6 @@ public class Token {
 		return value;
 	}
 
-	@NotNull
 	@Override
 	public String toString() {
 		if (getValue() != null) {
@@ -48,7 +45,7 @@ public class Token {
 		CHAR_LITERAL,
 		OPERATOR,
 		COMMA,
-		FUNC_REF,
+		AT,
 		NEW_LINE,
 		COLON,
 		GLOBAL_ACCESS,

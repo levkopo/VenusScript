@@ -2,8 +2,11 @@ package com.levkopo.vs.component.object;
 
 import com.levkopo.vs.component.Container;
 import com.levkopo.vs.executor.Context;
+import com.levkopo.vs.expression.Constant;
+import com.levkopo.vs.expression.NewObject;
 import com.levkopo.vs.type.ObjectType;
 import com.levkopo.vs.type.Type;
+import com.levkopo.vs.value.ObjectValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,12 +26,16 @@ public class ObjectDefinition extends Container {
 		return attributes;
 	}
 
+	public void addAttribute(Attribute attribute) {
+		attributes.add(attribute);
+	}
+
 	public String getName() {
 		return name;
 	}
 
 	public Type getType() {
-		return type;
+ 		return type;
 	}
 
 	@Override
@@ -39,6 +46,6 @@ public class ObjectDefinition extends Container {
 
 	@Override
 	public String toString() {
-		return "objectdef(" + getName() + ')';
+		return null;
 	}
 }

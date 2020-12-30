@@ -9,7 +9,7 @@ import com.levkopo.vs.exception.compile.UnexpectedTokenException;
 import com.levkopo.vs.expression.*;
 import com.levkopo.vs.function.Argument;
 import com.levkopo.vs.function.Definition;
-import com.levkopo.vs.library.VenusLibrary;
+import com.levkopo.vs.library.VSLibrary;
 import com.levkopo.vs.operator.BinaryOperator;
 import com.levkopo.vs.operator.Operator;
 import com.levkopo.vs.operator.OperatorList;
@@ -35,18 +35,19 @@ public class VenusParser {
 		this.script = script;
 	}
 
-	public synchronized void parse(VenusLexer lexer, Container target) throws ScriptCompileException {
+	public /*synchronized*/ void parse(VenusLexer lexer, Container target) throws ScriptCompileException {
 		this.container = target;
 		this.lexer = lexer;
 
 		Token token;
 		boolean justExitedIfContainer = false;
+		Map<String, Annotation> annotations = new HashMap<>();
 
 		while ((token = lexer.nextToken()) != null) {
 			if (container instanceof ObjectDefinition) {
 				if (token.getType() == Token.Type.NAME_DEFINITION) {
 					if (token.getValue().equals(KeywordDefinitions.DEFINE)) {
-						parseDefinition(false);
+						parseDefinition(false, annotations);
 
 						continue;
 					}
@@ -59,94 +60,141 @@ public class VenusParser {
 
 			if (token.getType() == Token.Type.GLOBAL_ACCESS) {
 				lexer.reRead(token);
-				addComponent(readExpression(Token.Type.NEW_LINE), true);
-			} else if (token.getType() == Token.Type.NAME_DEFINITION) {
-				if (token.getValue().equals(KeywordDefinitions.ASYNC)) {
-					if (nextAsyncable) {
-						bye(token, "duplicated 'async' keyword");
-					}
+				addComponent(readExpression(Token.Type.NEW_LINE));
+			}else if(token.getType() == Token.Type.AT){
+				String name = requireToken().getValue();
+				List<Value> data = new ArrayList<>();
 
-					this.nextAsyncable = true;
-				} else if (token.getValue().equals(KeywordDefinitions.BREAK) || token.getValue().equals(KeywordDefinitions.CONTINUE)) {
-					requireToken(Token.Type.NEW_LINE, "expected a new line");
-
-					Container lookup = container;
-					boolean foundContinuable = false;
-
-					while (lookup != null) {
-						if (lookup instanceof Breakable) {
-							foundContinuable = true;
-
+				token = requireToken();
+				if(token.getType() == Token.Type.OPEN_PARENTHESE){
+					while (true){
+						data.add(readValue());
+						token = requireToken();
+						if(token.getType()==Token.Type.CLOSE_PARENTHESE)
 							break;
+						else if(token.getType()!=Token.Type.COMMA)
+							bye(token, "expected comma");
+					}
+				}else if(token.getType() != Token.Type.NEW_LINE)
+					bye(token, "expected a new line");
+
+				if(annotations.containsKey(name))
+					bye(token, "duplicated '"+name+"' annotation");
+
+				annotations.put(name, new Annotation(name, data));
+			}else if (token.getType() == Token.Type.NAME_DEFINITION) {
+				switch (token.getValue()) {
+					case KeywordDefinitions.ASYNC:
+						if (nextAsyncable) {
+							bye(token, "duplicated 'async' keyword");
 						}
 
-						// If there is a definition, at run-time it will be in a single context,
-						// so do not let lookuping a definition's parents
-						if (lookup instanceof Definition) {
-							break;
+						this.nextAsyncable = true;
+						break;
+					case KeywordDefinitions.BREAK:
+					case KeywordDefinitions.CONTINUE:
+						requireToken(Token.Type.NEW_LINE, "expected a new line");
+
+						Container lookup = container;
+						boolean foundContinuable = false;
+
+						while (lookup != null) {
+							if (lookup instanceof Breakable) {
+								foundContinuable = true;
+
+								break;
+							}
+
+							// If there is a definition, at run-time it will be in a single context,
+							// so do not let lookuping a definition's parents
+							if (lookup instanceof Definition) {
+								break;
+							}
+
+							lookup = lookup.getParent();
 						}
 
-						lookup = lookup.getParent();
-					}
-
-					if (foundContinuable) {
-						addComponent(token.getValue().equals(KeywordDefinitions.BREAK) ? new Break() : new Continue(), false);
-					} else {
-						bye(token, "there is no parent container available");
-					}
-				} else if (token.getValue().equals(KeywordDefinitions.DAEMON)) {
-					if (nextAsyncable) {
-						if (nextDaemon) {
-							bye(token, "duplicated 'daemon' keyword");
+						if (foundContinuable) {
+							addComponent(token.getValue().equals(KeywordDefinitions.BREAK) ? new Break() : new Continue(), false);
+						} else {
+							bye(token, "there is no parent container available");
 						}
+						break;
+					case KeywordDefinitions.DAEMON:
+						if (nextAsyncable) {
+							if (nextDaemon) {
+								bye(token, "duplicated 'daemon' keyword");
+							}
 
-						this.nextDaemon = true;
-					} else {
-						bye(token, "'daemon' keyword must come after an 'async' keyword");
-					}
-				} else if (token.getValue().equals(KeywordDefinitions.DEFINE)) {
-					parseDefinition(true);
-				} else if (token.getValue().equals(KeywordDefinitions.DO)) {
-					requireToken(Token.Type.OPEN_BRACE, "expected an open brace");
-					addContainer(new DoWhileContainer(null), true);
-				} else if (token.getValue().equals(KeywordDefinitions.ELSE)) {
-					if (justExitedIfContainer) {
-						parseElse();
-					} else {
-						bye(token, "no previous 'if' container");
-					}
-				} else if (token.getValue().equals(KeywordDefinitions.EXPORT)) {
-					if (container == script) {
-						parseExport();
-					} else {
-						bye(token, "cannot use 'export' keyword inside container");
-					}
-				} else if (token.getValue().equals(KeywordDefinitions.FOR)) {
-					parseFor();
-				} else if (token.getValue().equals(KeywordDefinitions.IF)) {
-					parseIf(false);
-				} else if (token.getValue().equals(KeywordDefinitions.INCLUDE)) {
-					if (container == script) {
-						parseInclude();
-					} else {
-						bye(token, "cannot use 'import' keyword inside container");
-					}
-				} else if (token.getValue().equals(KeywordDefinitions.OBJECT)) {
-					parseObject();
-				} else if (token.getValue().equals(KeywordDefinitions.RETURN)) {
-					parseReturn();
-				} else if (token.getValue().equals(KeywordDefinitions.USING)) {
-					if (container == script) {
-						parseUsing();
-					} else {
-						bye(token, "cannot use 'using' keyword inside container");
-					}
-				} else if (token.getValue().equals(KeywordDefinitions.WHILE)) {
-					parseWhile();
-				} else {
-					lexer.reRead(token);
-					addComponent(readExpression(Token.Type.NEW_LINE), true);
+							this.nextDaemon = true;
+						} else {
+							bye(token, "'daemon' keyword must come after an 'async' keyword");
+						}
+						break;
+					case KeywordDefinitions.DEFINE:
+						parseDefinition(true, annotations);
+						break;
+					case KeywordDefinitions.DO:
+						requireToken(Token.Type.OPEN_BRACE, "expected an open brace");
+						addContainer(new DoWhileContainer(null), true);
+						break;
+					case KeywordDefinitions.ELSE:
+						if (justExitedIfContainer) {
+							parseElse();
+						} else {
+							bye(token, "no previous 'if' container");
+						}
+						break;
+					case KeywordDefinitions.EXPORT:
+						if (container == script) {
+							parseExport();
+						} else {
+							bye(token, "cannot use 'export' keyword inside container");
+						}
+						break;
+					case KeywordDefinitions.FOR:
+						parseFor();
+						break;
+					case KeywordDefinitions.IF:
+						parseIf(false);
+						break;
+					case KeywordDefinitions.TRY:
+						parseTry();
+						break;
+					case KeywordDefinitions.CATCH:
+						parseCatch();
+						break;
+					case KeywordDefinitions.INCLUDE:
+						if (container == script) {
+							parseInclude();
+						} else {
+							bye(token, "cannot use 'import' keyword inside container");
+						}
+						break;
+					case KeywordDefinitions.OBJECT:
+						parseObject();
+						break;
+					case KeywordDefinitions.RETURN:
+						parseReturn();
+						break;
+					case KeywordDefinitions.USING:
+						if (container == script) {
+							parseUsing();
+						} else {
+							bye(token, "cannot use 'using' keyword inside container");
+						}
+						break;
+					case KeywordDefinitions.WHILE:
+						parseWhile();
+						break;
+					default:
+						lexer.reRead(token);
+						addComponent(readExpression(Token.Type.NEW_LINE));
+						break;
 				}
+
+				if(!token.getValue().equals(KeywordDefinitions.AT_STR))
+					annotations.clear();
 
 				justExitedIfContainer = false;
 			} else if (token.getType() == Token.Type.OPEN_BRACE) {
@@ -178,12 +226,19 @@ public class VenusParser {
 						this.container = container.getParent();
 					}
 					while (container instanceof AsyncContainer);
+
+					if(container instanceof Definition) {
+						Definition definition = (Definition) container;
+						if(definition.getName().startsWith("lambda")){
+							break;
+						}
+					}
 				} else {
 					bye(token, "no container to close");
 				}
-			} else if (token.getType() != Token.Type.NEW_LINE) {
+			}else if(token.getType() != Token.Type.NEW_LINE) {
 				lexer.reRead(token);
-				addComponent(readExpression(Token.Type.NEW_LINE), true);
+				addComponent(readExpression(Token.Type.NEW_LINE));
 			}
 		}
 	}
@@ -210,8 +265,8 @@ public class VenusParser {
 		}
 	}
 
-	protected void addComponent(Expression expression, boolean asyncable) throws UnexpectedTokenException {
-		addComponent(new SimpleComponent(expression), asyncable);
+	protected void addComponent(Expression expression) throws UnexpectedTokenException {
+		addComponent(new SimpleComponent(expression), true);
 	}
 
 	protected void addContainer(Container container, boolean asyncable) throws UnexpectedTokenException {
@@ -232,7 +287,7 @@ public class VenusParser {
 	protected Value getValueOf(Token token) throws ScriptCompileException {
 		String value = token.getValue();
 
-		if (token.getType() == Token.Type.FUNC_REF) {
+		if (token.getType() == Token.Type.AT) {
 			Token next = requireToken();
 
 			if (next.getType() == Token.Type.NAME_DEFINITION) {
@@ -274,10 +329,10 @@ public class VenusParser {
 
 		if (token.getType() == Token.Type.DECIMAL_LITERAL) {
 			try {
-				return new DecimalValue(Double.parseDouble(value));
+				return new IntegerValue(Long.parseLong(value));
 			}catch(NumberFormatException e) {
 				try {
-					return new IntegerValue(Long.parseLong(value));
+					return new DecimalValue(Double.parseDouble(value));
 				}catch(NumberFormatException ignored) {}
 			}
 
@@ -300,6 +355,10 @@ public class VenusParser {
 			if (value.equals(KeywordDefinitions.FALSE)) {
 				return new BoolValue(false);
 			}
+
+			if(value.equals(KeywordDefinitions.NULL)){
+				return new NullValue();
+			}
 		}
 
 		if (token.getType() == Token.Type.OPERATOR && token.getValue().equals("*")) {
@@ -320,14 +379,14 @@ public class VenusParser {
 		return null;
 	}
 
-	protected Object parseArrayElementOperation(String currentNameDef, Expression index, String operatorStr, Token errorToken, boolean mustBeUnary) throws ScriptCompileException {
+	protected Object parseArrayElementOperation(String currentNameDef, Expression index, String operatorStr, Token errorToken) throws ScriptCompileException {
 		if (operatorStr.equals("=")) {
 			Expression expression = readExpression(token -> token.getType() != Token.Type.NEW_LINE && token.getType() != Token.Type.CLOSE_PARENTHESE, token -> true);
 
 			return new ArraySet(currentNameDef, index, expression);
 		}
 
-		Operator opr = OperatorList.forIdentifier(operatorStr, mustBeUnary);
+		Operator opr = OperatorList.forIdentifier(operatorStr, false);
 
 		if (opr != null) {
 			return opr;
@@ -352,14 +411,32 @@ public class VenusParser {
 			}
 		}
 
-		bye(errorToken, "expected a valid " + (mustBeUnary ? "unary operator" : "operator") + " (+, -, *, /, %, ...)");
+		bye(errorToken, "expected a valid" + "operator (+, -, *, /, %, ...)");
 
 		return null; // Will not happen
 	}
 
-	protected void parseDefinition(boolean isGlobal) throws ScriptCompileException {
+	protected void parseDefinition(boolean isGlobal, Map<String, Annotation> annotations) throws ScriptCompileException {
 		Token typeToken = requireToken(Token.Type.NAME_DEFINITION, "expected a definition name");
 		String definitionName = typeToken.getValue();
+
+		List<Argument> arguments = parseArguments();
+
+		Type return_type = PrimitiveType.ANY;
+
+		Token nextToken = requireToken();
+		if(nextToken.getType() == Token.Type.COLON){
+			Token return_type_token = requireToken();
+			return_type = PrimitiveType.forIdentifier(return_type_token.getValue());
+
+			requireToken(Token.Type.OPEN_BRACE, "expected an open brace");
+		}else if(nextToken.getType()!=Token.Type.OPEN_BRACE)
+			bye("expected an open brace");
+
+		addContainer(new Definition(definitionName, arguments, isGlobal, return_type, annotations), false);
+	}
+
+	protected List<Argument> parseArguments() throws ScriptCompileException{
 		List<Argument> arguments = new ArrayList<>();
 
 		requireToken(Token.Type.OPEN_PARENTHESE, "expected an open parenthese");
@@ -370,45 +447,33 @@ public class VenusParser {
 			if (reading.getType() == Token.Type.NAME_DEFINITION) {
 				Type argumentType = PrimitiveType.forIdentifier(reading.getValue());
 
-				if (argumentType != null) {
-					Token argumentToken = requireToken(Token.Type.NAME_DEFINITION, "expected an argument name");
-					String argumentName = argumentToken.getValue();
+				Token argumentToken = argumentType!=null?
+						requireToken(Token.Type.NAME_DEFINITION, "expected an argument name"):
+						reading;
 
-					if (!KeywordDefinitions.isKeyword(argumentName)) {
-						arguments.add(new Argument(argumentName, argumentType));
+				String argumentName = argumentToken.getValue();
 
-						Token commaOrClose = requireToken();
+				if (!KeywordDefinitions.isKeyword(argumentName)) {
+					arguments.add(new Argument(argumentName, argumentType!=null?argumentType:PrimitiveType.ANY));
 
-						if (commaOrClose.getType() == Token.Type.CLOSE_PARENTHESE) {
-							break;
-						}
+					Token commaOrClose = requireToken();
 
-						if (commaOrClose.getType() != Token.Type.COMMA) {
-							bye(commaOrClose, "expected an argument separator (comma) or close parenthese");
-						}
-					} else {
-						bye(argumentToken, "argument name cannot be a keyword");
+					if (commaOrClose.getType() == Token.Type.CLOSE_PARENTHESE) {
+						break;
+					}
+
+					if (commaOrClose.getType() != Token.Type.COMMA) {
+						bye(commaOrClose, "expected an argument separator (comma) or close parenthese");
 					}
 				} else {
-					bye(reading, "expected an argument value type (" + PrimitiveType.values().toString() + ") or object type");
+					bye(argumentToken, "argument name cannot be a keyword");
 				}
 			} else {
 				bye(reading, "expected an argument name");
 			}
 		}
-		Type return_type = PrimitiveType.ANY;
 
-		Token nextToken = requireToken();
-		if(nextToken.getType() == Token.Type.COLON){
-			Token return_type_token = requireToken();
-			return_type = PrimitiveType.forIdentifier(return_type_token.getValue());
-
-			requireToken(Token.Type.OPEN_BRACE, "expected an open brace");
-		}else if(nextToken.getType()!=Token.Type.OPEN_BRACE)
-			bye(reading, "expected an open brace");
-
-
-		addContainer(new Definition(definitionName, arguments, isGlobal, return_type), false);
+		return arguments;
 	}
 
 	protected void parseElse() throws ScriptCompileException {
@@ -474,6 +539,14 @@ public class VenusParser {
 		}
 	}
 
+	private void parseCatch() throws ScriptCompileException {
+		if(container instanceof TryContainer){
+			Definition definition = new Definition("catch", parseArguments(), false, PrimitiveType.ANY);
+
+			//container.addChildren(definition);
+			addContainer(definition, false);
+		}else bye("Where try?");
+	}
 
 	protected void parseIf(boolean isElseIf) throws ScriptCompileException {
 		Expression expression = readExpression(Token.Type.OPEN_BRACE);
@@ -525,7 +598,7 @@ public class VenusParser {
 					lexer.reRead(test);
 				}
 
-				definition.getAttributes().add(new Attribute(next.getValue(), defaultExpression));
+				definition.addAttribute(new Attribute(next.getValue(), defaultExpression));
 			} else if (next.getType() != Token.Type.COMMA) {
 				bye(next, "expected an attribute name or close parenthese");
 			}
@@ -606,8 +679,8 @@ public class VenusParser {
 				bye(t, "expected NAME DEFINITION");
 
 			String libraryName = t.getValue();
-			Supplier<VenusLibrary> supplier = script.getApplicationContext().getLibrarySuppliers().get(libraryName);
-			VenusLibrary library;
+			Supplier<VSLibrary> supplier = script.getApplicationContext().getLibrarySuppliers().get(libraryName);
+			VSLibrary library;
 
 			if (supplier != null && (library = supplier.get()) != null) {
 				script.getLibraryList().add(library);
@@ -623,15 +696,16 @@ public class VenusParser {
 		}
 	}
 
+	protected void parseTry() throws UnexpectedTokenException {
+		TryContainer tryContainer = new TryContainer();
+		addContainer(tryContainer, false);
+	}
+
 	protected void parseWhile() throws ScriptCompileException {
 		Expression expression = readExpression(Token.Type.OPEN_BRACE);
 		WhileContainer whileContainer = new WhileContainer(expression);
 
 		addContainer(whileContainer, true);
-	}
-
-	protected Expression readExpression(Predicate<Token> process) throws ScriptCompileException {
-		return readExpression(process, token -> false);
 	}
 
 	protected Expression readExpression(Predicate<Token> process, Predicate<Token> reReadLast) throws ScriptCompileException {
@@ -681,7 +755,7 @@ public class VenusParser {
 					Object r;
 
 					if (arrayIndex != null) {
-						r = parseArrayElementOperation(nameDef, arrayIndex, operator, token, false);
+						r = parseArrayElementOperation(nameDef, arrayIndex, operator, token);
 					} else {
 						r = parseOperation(nameDef, operator, token, false);
 					}
@@ -711,7 +785,7 @@ public class VenusParser {
 					if (arrayIndex == null) {
 						arrayIndex = readExpression(Token.Type.CLOSE_BRACKET);
 					} else {
-						bye(token, "already has index expression");
+						bye(token, "index already set");
 					}
 				} else {
 					Expression[] expressions = readExpressions(Token.Type.COMMA, Token.Type.CLOSE_BRACKET);
@@ -756,6 +830,27 @@ public class VenusParser {
 					}
 
 					expression.addExpression(this, token, new NewObject(objectTypeToken.getValue(), attributes));
+				} else if(token.getValue().equals(KeywordDefinitions.DEFINE)){
+				    List<Argument> arguments = parseArguments();
+                    Type return_type = PrimitiveType.ANY;
+
+                    Token nextToken = requireToken();
+                    if(nextToken.getType() == Token.Type.COLON){
+                        Token return_type_token = requireToken();
+                        return_type = PrimitiveType.forIdentifier(return_type_token.getValue());
+
+                        requireToken(Token.Type.OPEN_BRACE, "expected an open brace");
+                    }else if(nextToken.getType()!=Token.Type.OPEN_BRACE)
+                        bye("expected an open brace");
+
+					Definition definition = new Definition("lambda"+arguments.size(), arguments, false, return_type);
+					expression.addExpression(this, token, new Constant(new FunctionRefValue(definition.getName())));
+
+					//definition.setParent(container);
+
+					addContainer(definition, false);
+					parse(lexer, container);
+
 				} else {
 					nameDef = token.getValue();
 					nameDefToken = token;
@@ -764,8 +859,19 @@ public class VenusParser {
 				Map<Value, Expression> map = new HashMap<>();
 
 				while(requireToken().getType() != Token.Type.CLOSE_BRACE){
-					Value name = readValue();
-					requireToken(Token.Type.COLON, "expected colon");
+					Value name;
+					try {
+						name = readValue();
+					}catch (Exception e){
+						break;
+					}
+
+					Token delimiter = requireToken();
+					if(delimiter.getType()==Token.Type.CLOSE_BRACE)
+						break;
+					else if(delimiter.getType()!=Token.Type.COLON)
+						bye(delimiter, "expected colon");
+
 					Expression value = readExpression(t -> t.getType() != Token.Type.CLOSE_BRACE
 						&& t.getType() != Token.Type.COMMA,
 						t -> t.getType() == Token.Type.CLOSE_BRACE);

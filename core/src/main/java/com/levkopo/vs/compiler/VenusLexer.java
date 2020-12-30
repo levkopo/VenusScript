@@ -217,8 +217,8 @@ public class VenusLexer {
 							return new Token(Type.COMMA, ch);
 						}
 
-						if (ch == KeywordDefinitions.FUNCTION_REFERENCE) {
-							return new Token(Type.FUNC_REF, ch);
+						if (ch == KeywordDefinitions.AT) {
+							return new Token(Type.AT, ch);
 						}
 
 						if(ch == '\uFEFF')

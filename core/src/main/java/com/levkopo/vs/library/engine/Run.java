@@ -27,7 +27,8 @@ public class Run extends Method {
 		if (origin != null) {
 			try {
 				Script script = origin.compile(current.getApplicationContext());
-				VenusExecutor executor = new VenusExecutor();
+				VenusExecutor executor =
+						new VenusExecutor(context.getApplicationContext().currentExecutor().throwableConsumer);
 
 				executor.run(script, ScriptMode.NORMAL);
 

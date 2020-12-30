@@ -1,18 +1,20 @@
 package com.levkopo.vs.library;
 
+import com.levkopo.vs.component.object.ObjectDefinition;
 import com.levkopo.vs.function.Function;
 import com.levkopo.vs.type.Type;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class LibraryList extends ArrayList<VenusLibrary> {
+public class LibraryList extends ArrayList<VSLibrary> {
+
 	public Function findFunction(String name, List<Type> argumentTypes) {
 		Function found = null;
 		Function foundVarArgs = null;
 
-		for (VenusLibrary library : this) {
-			for (Function function : library) {
+		for (VSLibrary library : this) {
+			for (Function function : library.functions) {
 				if (function.accepts(name, argumentTypes)) {
 					if (function.isVarArgs()) {
 						if (foundVarArgs == null) {
@@ -28,26 +30,15 @@ public class LibraryList extends ArrayList<VenusLibrary> {
 		return found != null ? found : foundVarArgs;
 	}
 
-	/*public Function findObject(String name, XView<Type> argumentTypes) {
-		XApi.requireNonNull(name, "name");
-
-		Function found = null;
-		Function foundVarArgs = null;
-
+	public ObjectDefinition findObject(String name) {
 		for (VSLibrary library : this) {
 			for (ObjectDefinition object: library.objects) {
-				if (object.accepts(name, argumentTypes)) {
-					if (function.isVarArgs()) {
-						if (foundVarArgs == null) {
-							foundVarArgs = function;
-						}
-					} else {
-						found = function;
-					}
+				if (object.getName().equals(name)) {
+					return object;
 				}
 			}
 		}
 
-		return found != null ? found : foundVarArgs;
-	}*/
+		return null;
+	}
 }

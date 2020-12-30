@@ -18,7 +18,7 @@ public class FunctionRefValue extends Value {
 
 	@Override
 	public String toString() {
-		return KeywordDefinitions.FUNCTION_REFERENCE + value();
+		return KeywordDefinitions.AT + value();
 	}
 
 	@Override

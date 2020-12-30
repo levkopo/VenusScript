@@ -1,10 +1,6 @@
 package com.levkopo.vs.value;
 
-import com.levkopo.vs.exception.runtime.InvalidMapAccessException;
-import com.levkopo.vs.exception.runtime.ScriptRuntimeException;
-import com.levkopo.vs.executor.Context;
 import com.levkopo.vs.type.PrimitiveType;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -41,9 +37,9 @@ public class MapValue extends IterableValue{
 		return map.values().spliterator();
 	}
 
-	public Value get(Context context, Value index) throws ScriptRuntimeException {
+	public Value get(Value index) {
 		if (!map.containsKey(index.value())) {
-			throw new InvalidMapAccessException(context, "Oops.. Map not contains this value");
+			return new NullValue();
 		}
 
 		return map.get(index.value());
@@ -56,11 +52,6 @@ public class MapValue extends IterableValue{
 	@Override
 	public Map<Object, Value> value() {
 		return map;
-	}
-
-	@Override
-	public MethodVisitor visit(MethodVisitor visitor) {
-		return super.visit(visitor);
 	}
 
 	@Override

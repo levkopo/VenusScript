@@ -1,10 +1,7 @@
 package com.levkopo.vs.compiler;
 
 import com.levkopo.vs.exception.compile.UnexpectedTokenException;
-import com.levkopo.vs.expression.BinaryOperation;
-import com.levkopo.vs.expression.Expression;
-import com.levkopo.vs.expression.InContext;
-import com.levkopo.vs.expression.UnaryOperation;
+import com.levkopo.vs.expression.*;
 import com.levkopo.vs.operator.BinaryOperator;
 import com.levkopo.vs.operator.Operator;
 import com.levkopo.vs.operator.OperatorList;
@@ -13,7 +10,7 @@ import com.levkopo.vs.operator.UnaryOperator;
 import java.util.*;
 
 public class BuildingExpression {
-	private List<String> inContext = new ArrayList<>();
+	private final List<String> inContext = new ArrayList<>();
 	private final List<Object> values = new ArrayList<>();
 	private Operator operator;
 	private Expression expression;
@@ -122,9 +119,18 @@ public class BuildingExpression {
 	}
 
 	private void setExpression(Expression expression) {
-		if (inContext != null) {
-			for(int i = inContext.size()-1; i!=-1; i--)
-				expression = new InContext(inContext.get(i), expression);
+		if (inContext.size()!=0) {
+			InContext expressionTmp = new InContext(inContext.get(0), inContext.size()==1?
+					expression:new Variable(inContext.get(1)));
+
+			if(inContext.size()>1) {
+				for (int i = inContext.size() - 1; i != 1; i--) {
+					expressionTmp = new InContext(expressionTmp, new Variable(inContext.get(i)));
+				}
+
+				expression = new InContext(expressionTmp, expression);
+			}else expression = expressionTmp;
+
 
 			this.inContext.clear();
 		}

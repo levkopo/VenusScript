@@ -1,17 +1,17 @@
 package com.levkopo.vs.function;
 
+import com.levkopo.vs.component.Component;
 import com.levkopo.vs.function.annotation.MethodArgs;
 import com.levkopo.vs.function.annotation.MethodName;
 import com.levkopo.vs.function.annotation.MethodVarArgs;
 import com.levkopo.vs.type.PrimitiveType;
 import com.levkopo.vs.type.Type;
 import com.levkopo.vs.value.Value;
-import com.sun.istack.internal.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Method implements Function {
+public abstract class Method extends Component implements Function {
 	private final List<Type> arguments;
 	private final String name;
 	private final boolean varArgs;
@@ -34,11 +34,15 @@ public abstract class Method implements Function {
 	}
 
 	@Override
+	public boolean deprecated() {
+		return getClass().isAnnotationPresent(Deprecated.class);
+	}
+
+	@Override
 	public final List<Type> getArgumentTypes() {
 		return arguments;
 	}
 
-	@NotNull
 	@Override
 	public final String getName() {
 		return name;

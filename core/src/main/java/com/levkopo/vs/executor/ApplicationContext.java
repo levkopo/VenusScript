@@ -1,18 +1,17 @@
 package com.levkopo.vs.executor;
 
-import com.levkopo.vs.Config;
 import com.levkopo.vs.component.SimpleContainer;
 import com.levkopo.vs.exception.runtime.UndefinedVariableException;
-import com.levkopo.vs.library.VenusLibrary;
+import com.levkopo.vs.library.StdLibrary;
+import com.levkopo.vs.library.VSLibrary;
 import com.levkopo.vs.library.dynamic.DynamicLibrary;
 import com.levkopo.vs.library.engine.EngineLibrary;
 import com.levkopo.vs.library.json.JSONLibrary;
 import com.levkopo.vs.library.math.MathLibrary;
 import com.levkopo.vs.library.request.RequestLibrary;
-import com.levkopo.vs.library.std.StdLibrary;
 import com.levkopo.vs.library.system.SystemLibrary;
-import com.levkopo.vs.library.time.TimeLibrary;
 
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -21,7 +20,7 @@ import java.util.function.Supplier;
 public class ApplicationContext extends Context {
 	private int currentLine;
 	private VenusExecutor executor;
-	private final Map<String, Supplier<VenusLibrary>> librarySuppliers;
+	private final Map<String, Supplier<VSLibrary>> librarySuppliers;
 	private final Map<String, Object> userData;
 
 	public ApplicationContext() {
@@ -32,19 +31,19 @@ public class ApplicationContext extends Context {
 		getLibrarySuppliers().put("dynamic", DynamicLibrary::new);
 		getLibrarySuppliers().put("engine", EngineLibrary::new);
 		getLibrarySuppliers().put("math", MathLibrary::new);
-		getLibrarySuppliers().put("std", StdLibrary::new);
 		getLibrarySuppliers().put("system", SystemLibrary::new);
-		getLibrarySuppliers().put("time", TimeLibrary::new);
 		getLibrarySuppliers().put("json", JSONLibrary::new);
 		getLibrarySuppliers().put("request", RequestLibrary::new);
+		getLibrarySuppliers().put("std", StdLibrary::new);
+		setUserData("timezone", ZoneId.systemDefault());
 		setUserData("in", new Scanner(System.in));
+		setUserData("err", (OutputReference) System.err::println);
 		setUserData("out", (OutputReference) System.out::println);
-		setUserData("version", Config.version);
 	}
 
 	@Override
-	public ApplicationContext clone() {
-		ApplicationContext context = new ApplicationContext();
+	public ApplicationContext clone() throws CloneNotSupportedException {
+		ApplicationContext context = (ApplicationContext) super.clone();
 
 		context.getLibrarySuppliers().putAll(getLibrarySuppliers());
 		context.userData.putAll(userData);
@@ -61,10 +60,11 @@ public class ApplicationContext extends Context {
 		return currentLine;
 	}
 
-	public Map<String, Supplier<VenusLibrary>> getLibrarySuppliers() {
+	public Map<String, Supplier<VSLibrary>> getLibrarySuppliers() {
 		return librarySuppliers;
 	}
 
+	@SuppressWarnings("unchecked")
 	public <E> E getUserData(String name, Class<E> type) throws UndefinedVariableException {
 		Object value = userData.get(name);
 
@@ -79,11 +79,11 @@ public class ApplicationContext extends Context {
 		userData.put(name, value);
 	}
 
-	void setCurrentLine(int currentLine) {
+	public void setCurrentLine(int currentLine) {
 		this.currentLine = currentLine;
 	}
 
-	void setExecutor(VenusExecutor executor) {
+	public void setExecutor(VenusExecutor executor) {
 		this.executor = executor;
 	}
 }

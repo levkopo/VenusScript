@@ -55,7 +55,10 @@ public class NewObject implements Expression {
 			}
 		}
 
-		return new ObjectValue(definition, c);
+		ObjectValue instance = new ObjectValue(definition, c);
+		c.setVar("this", instance);
+
+		return instance;
 	}
 
 	@Override

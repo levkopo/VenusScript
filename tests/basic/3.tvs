@@ -1,5 +1,3 @@
-using std
-
 i = 55
 j = -35
 println("i = " + i + ", j = " + j)
@@ -9,8 +7,8 @@ println("isPositive = " + isPositive)
 println("isNegative = " + !isPositive)
 println("isSurelyPositive = " + !!!!isPositive)
 --
-i = 55.0, j = -35.0
--i = -55.0, j = 35.0
+i = 55, j = -35
+-i = -55, j = 35
 isPositive = true
 isNegative = false
 isSurelyPositive = true

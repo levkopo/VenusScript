@@ -18,7 +18,8 @@ public class KeywordDefinitions {
 	public static final String EXPORT = "export";
 	public static final String FALSE = "false";
 	public static final String FOR = "for";
-	public static final char FUNCTION_REFERENCE = '@';
+	public static final String AT_STR = "@";
+	public static final char AT = '@';
 	public static final char GLOBAL_ACCESS = '$';
 	public static final String IF = "if";
 	public static final String IN = "in";
@@ -30,6 +31,9 @@ public class KeywordDefinitions {
 	public static final String TRUE = "true";
 	public static final String USING = "using";
 	public static final String WHILE = "while";
+	public static final String NULL = "null";
+	public static final String TRY = "try";
+	public static final String CATCH = "catch";
 
 	public static boolean isKeyword(String definition) {
 		return values().contains(definition);
