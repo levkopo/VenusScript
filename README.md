@@ -13,5 +13,4 @@ VenusScript is meant to be used within ant Java or JVM-built (Groovy, Kotlin, Sc
 - Ignitium Core: core dependency (Will be replaced soon as its code is closed)
 
 ## Documentation
-
-*Work in progress.*
+[Click here](https://github.com/levkopo/VenusScript/wiki)
