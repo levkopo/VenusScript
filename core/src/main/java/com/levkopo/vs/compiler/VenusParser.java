@@ -709,6 +709,10 @@ public class VenusParser {
 	}
 
 	protected Expression readExpression(Predicate<Token> process, Predicate<Token> reReadLast) throws ScriptCompileException {
+		return readExpression(process, reReadLast, true);
+	}
+
+	protected Expression readExpression(Predicate<Token> process, Predicate<Token> reReadLast, boolean needNewLine) throws ScriptCompileException {
 		BuildingExpression expression = new BuildingExpression();
 		String nameDef = null;
 		Expression arrayIndex = null;
@@ -869,19 +873,20 @@ public class VenusParser {
 					Token delimiter = requireToken();
 					if(delimiter.getType()==Token.Type.CLOSE_BRACE)
 						break;
+
 					else if(delimiter.getType()!=Token.Type.COLON)
 						bye(delimiter, "expected colon");
 
 					Expression value = readExpression(t -> t.getType() != Token.Type.CLOSE_BRACE
 						&& t.getType() != Token.Type.COMMA,
-						t -> t.getType() == Token.Type.CLOSE_BRACE);
+						t -> t.getType() == Token.Type.CLOSE_BRACE, false);
 
 					map.put(name, value);
 				}
 
 				arrayIndex = null;
 				expression.addExpression(this, token, new MapLiteral(map));
-			} else if (token.getType() != Token.Type.NEW_LINE) {
+			} else if (token.getType() != Token.Type.NEW_LINE&&needNewLine) {
 				bye(token, "unexpected token");
 			}
 		}
